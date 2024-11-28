@@ -19,7 +19,7 @@ stages:
       -trtp ${path.train_target}
       -tetp ${path.test_target}
       -omp ${path.output_model}
-      -s ${random_state}
+      -s ${seed}
       -ts ${split}
     deps:
     - data/prepared/prepared_data.csv
@@ -31,7 +31,7 @@ stages:
     - path.train_target
     - path.test_target
     - path.output_model
-    - random_state
+    - seed
     - split
     outs:
     - model.pickle
@@ -46,7 +46,7 @@ stages:
     - ${path.test_features}
     - ${path.train_target}
     - ${path.test_target}
-    - src/train_model.py
+    - src/evaluate_model.py
     params:
     - path.train_features
     - path.test_features
