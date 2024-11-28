@@ -34,7 +34,7 @@ stages:
     - seed
     - split
     outs:
-    - model.pickle
+    - ${path.output_model}
   evaluate_model:
     cmd: python src/evaluate_model.py 
       -tp ${path.test_target}
