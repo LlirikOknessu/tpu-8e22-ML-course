@@ -1,0 +1,2 @@
+Error: Command failed with exit code 255: c:\Users\Admin\PycharmProjects\tpu-8e22-ML-course\venv\Scripts\python.exe -m dvc dag --md
+ERROR: failed to parse 'stages.train_model.cmd' in 'dvc.yaml': Could not find 'random_state'

@@ -1,0 +1,59 @@
+stages:
+  prepare_data:
+    cmd: python src/prepare_data.py
+      -ip ${path.raw_data}
+      -op ${path.prepared_data}
+    deps:
+    - path.raw_data
+    - src/prepare_data.py
+    params:
+    - path.raw_data
+    - path.prepared_data
+    outs:
+    - data/prepared
+  train_model:
+    cmd: python src/train_model.py
+      -idp ${path.prepared_data}
+      -trfp ${path.train_features}
+      -tefp ${path.test_features}
+      -trtp ${path.train_target}
+      -tetp ${path.test_target}
+      -omp ${path.output_model}
+      -s ${random_state}
+      -ts ${split}
+    deps:
+    - data/prepared/prepared_data.csv
+    - src/train_model.py
+    params:
+    - path.prepared_data
+    - path.train_features
+    - path.test_features
+    - path.train_target
+    - path.test_target
+    - path.output_model
+    - random_state
+    - split
+    outs:
+    - model.pickle
+  evaluate_model:
+    cmd: python src/evaluate_model.py 
+      -tp ${path.test_target}
+      -fp ${path.test_features}
+      -mp ${path.output_model}
+      -op %{path.metrics}
+    deps:
+    - ${path.train_features}
+    - ${path.test_features}
+    - ${path.train_target}
+    - ${path.test_target}
+    - src/train_model.py
+    params:
+    - path.train_features
+    - path.test_features
+    - path.train_target
+    - path.test_target
+    - path.metrics
+    metrics:
+    - path.metrics
+    outs:
+    - path.metrics
