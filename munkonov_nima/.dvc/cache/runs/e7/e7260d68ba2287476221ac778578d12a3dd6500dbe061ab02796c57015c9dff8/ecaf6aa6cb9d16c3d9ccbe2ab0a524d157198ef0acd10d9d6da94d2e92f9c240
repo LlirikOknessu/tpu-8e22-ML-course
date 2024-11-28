@@ -1,0 +1,20 @@
+cmd: python src/prepare_data.py -ip data/raw/test_scores.csv -op data/prepared/prepared_data.csv
+deps:
+- path: data/raw/test_scores.csv
+  hash: md5
+  md5: 3d3a31f8b3dc42242665cf65b6b427e8
+  size: 173352
+- path: src/prepare_data.py
+  hash: md5
+  md5: ded2bbd23a6fdd6fe48f674c2a386bc1
+  size: 2298
+params:
+  params.yaml:
+    path.prepared_data: data/prepared/prepared_data.csv
+    path.raw_data: data/raw/test_scores.csv
+outs:
+- path: data/prepared
+  hash: md5
+  md5: 861fc985195599c473bf39eee9d5f07e.dir
+  size: 129675
+  nfiles: 2

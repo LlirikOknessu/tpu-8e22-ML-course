@@ -4,7 +4,7 @@ stages:
       -ip ${path.raw_data}
       -op ${path.prepared_data}
     deps:
-    - path.raw_data
+    - ${path.raw_data}
     - src/prepare_data.py
     params:
     - path.raw_data
