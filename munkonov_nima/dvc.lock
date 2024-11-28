@@ -18,6 +18,70 @@ stages:
     outs:
     - path: data/prepared
       hash: md5
-      md5: 861fc985195599c473bf39eee9d5f07e.dir
-      size: 129675
-      nfiles: 2
+      md5: 3bafd63fb144f61131394b851dd10cd4.dir
+      size: 146475
+      nfiles: 4
+  train_model:
+    cmd: python src/train_model.py -idp data/prepared/prepared_data.csv -trfp data/prepared/train_features.csv
+      -tefp data/prepared/train_features.csv -trtp data/prepared/train_target.csv
+      -tetp data/prepared/train_target.csv -omp model/predictor.pickle -s 42 -ts 0.2
+    deps:
+    - path: data/prepared/prepared_data.csv
+      hash: md5
+      md5: 0e204de9f179fff96d3c4f2a349831eb
+      size: 81967
+    - path: src/train_model.py
+      hash: md5
+      md5: 09b9f0bc6405f36d63b9695980e9d490
+      size: 1901
+    params:
+      params.yaml:
+        path.output_model: model/predictor.pickle
+        path.prepared_data: data/prepared/prepared_data.csv
+        path.test_features: data/prepared/train_features.csv
+        path.test_target: data/prepared/train_target.csv
+        path.train_features: data/prepared/train_features.csv
+        path.train_target: data/prepared/train_target.csv
+        seed: 42
+        split: 0.2
+    outs:
+    - path: model/predictor.pickle
+      hash: md5
+      md5: 16d3eeb2bb0ce0008b626931e6f5e0df
+      size: 609
+  evaluate_model:
+    cmd: python src/evaluate_model.py -tp data/prepared/train_target.csv -fp data/prepared/train_features.csv
+      -mp model/predictor.pickle -op metrics.json
+    deps:
+    - path: data/prepared/train_features.csv
+      hash: md5
+      md5: 37b3197a4936bfac4fce77c47058ce4b
+      size: 14406
+    - path: data/prepared/train_features.csv
+      hash: md5
+      md5: 37b3197a4936bfac4fce77c47058ce4b
+      size: 14406
+    - path: data/prepared/train_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
+    - path: data/prepared/train_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
+    - path: src/evaluate_model.py
+      hash: md5
+      md5: c2ad52506abc4736c28a0ffa526ced22
+      size: 1246
+    params:
+      params.yaml:
+        path.metrics: metrics.json
+        path.test_features: data/prepared/train_features.csv
+        path.test_target: data/prepared/train_target.csv
+        path.train_features: data/prepared/train_features.csv
+        path.train_target: data/prepared/train_target.csv
+    outs:
+    - path: metrics.json
+      hash: md5
+      md5: bdd7b6b60c2f0a4793e567b6c8f56245
+      size: 79

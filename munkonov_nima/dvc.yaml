@@ -40,7 +40,7 @@ stages:
       -tp ${path.test_target}
       -fp ${path.test_features}
       -mp ${path.output_model}
-      -op %{path.metrics}
+      -op ${path.metrics}
     deps:
     - ${path.train_features}
     - ${path.test_features}

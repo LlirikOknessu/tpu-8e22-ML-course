@@ -22,7 +22,7 @@ if __name__ == '__main__':
     args = parse_args()
 
     # Загружаем модель
-    model: LinearRegression = pickle.load(open(args.input_filename, 'rb'))
+    model: LinearRegression = pickle.load(open(args.model_path, 'rb'))
     X_test = pd.read_csv(args.test_features_path)
     Y_test = pd.read_csv(args.test_target_path)
 
@@ -33,4 +33,5 @@ if __name__ == '__main__':
         'mae': mean_absolute_error(Y_test, Y_pred)
     }
 
-    json.dump(result, args.output_path)
+    with open(args.output_path, 'w') as file:
+        json.dump(result, file)
