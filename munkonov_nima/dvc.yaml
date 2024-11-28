@@ -54,6 +54,4 @@ stages:
     - path.test_target
     - path.metrics
     metrics:
-    - path.metrics
-    outs:
-    - path.metrics
+    - ${path.metrics}
