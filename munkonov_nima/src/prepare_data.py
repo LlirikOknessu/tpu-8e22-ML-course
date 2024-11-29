@@ -26,6 +26,9 @@ if __name__ == '__main__':
     scores['f_teaching_method'] = scores['teaching_method'].replace(['Standard', 'Experimental'], [0, 1])
     scores['f_school_setting'] = scores['school_setting'].replace(['Rural', 'Urban', 'Suburban'], [0, 1, 2])
     scores['f_school_type'] = scores['school_type'].replace(['Public', 'Non-public'], [0, 1])
+    
+    # 3. Средний балл класса за предварительный тест
+    scores['f_class_mean'] = scores[['classroom','pretest']].groupby(['classroom']).transform('mean')
 
     # Экспортируем данные для обучения модели линейной регрессии
     scores = scores.select_dtypes(include=['number'])
