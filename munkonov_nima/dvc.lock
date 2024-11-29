@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/raw/test_scores.csv
       hash: md5
-      md5: 3d3a31f8b3dc42242665cf65b6b427e8
-      size: 173352
+      md5: dedbbc2822e89a304dc36cb350198b37
+      size: 171367
     - path: src/prepare_data.py
       hash: md5
       md5: a0cbc6094878340044b154832ca75fb3
