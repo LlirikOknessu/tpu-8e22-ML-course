@@ -9,18 +9,17 @@ stages:
       size: 173352
     - path: src/prepare_data.py
       hash: md5
-      md5: ded2bbd23a6fdd6fe48f674c2a386bc1
-      size: 2298
+      md5: c5444b3aba684cd19ef581604e21ace9
+      size: 1553
     params:
       params.yaml:
         path.prepared_data: data/prepared/prepared_data.csv
         path.raw_data: data/raw/test_scores.csv
     outs:
-    - path: data/prepared
+    - path: data/prepared/prepared_data.csv
       hash: md5
-      md5: a6c96804db6247c9b4dc875381e2cfef.dir
-      size: 213518
-      nfiles: 6
+      md5: 45d8584fe398aa8f706b116b32cbb875
+      size: 47708
   train_model:
     cmd: python src/train_model.py -idp data/prepared/prepared_data.csv -trfp data/prepared/train_features.csv
       -tefp data/prepared/test_features.csv -trtp data/prepared/train_target.csv -tetp
@@ -28,8 +27,8 @@ stages:
     deps:
     - path: data/prepared/prepared_data.csv
       hash: md5
-      md5: 0e204de9f179fff96d3c4f2a349831eb
-      size: 81967
+      md5: 45d8584fe398aa8f706b116b32cbb875
+      size: 47708
     - path: src/train_model.py
       hash: md5
       md5: 09b9f0bc6405f36d63b9695980e9d490
@@ -47,24 +46,24 @@ stages:
     outs:
     - path: model/predictor.pickle
       hash: md5
-      md5: 16d3eeb2bb0ce0008b626931e6f5e0df
-      size: 609
+      md5: 5ec1568eba85ec3f8eca598ed36ba586
+      size: 673
   evaluate_model:
     cmd: python src/evaluate_model.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
       -mp model/predictor.pickle -op metrics.json
     deps:
     - path: data/prepared/test_features.csv
       hash: md5
-      md5: 37b3197a4936bfac4fce77c47058ce4b
-      size: 14406
+      md5: 0ebcbf6f7f95743433731634d1df7c4c
+      size: 7619
     - path: data/prepared/test_target.csv
       hash: md5
       md5: afcba19219240ba2afaf22d924fb5eaf
       size: 2394
     - path: data/prepared/train_features.csv
       hash: md5
-      md5: 92161869ef5a4f8aed87e7a682719de4
-      size: 57506
+      md5: 45a90033432bd68f2ad81811c3665e15
+      size: 30229
     - path: data/prepared/train_target.csv
       hash: md5
       md5: 20c47de9d054f731d6417d964f44313c
@@ -83,5 +82,5 @@ stages:
     outs:
     - path: metrics.json
       hash: md5
-      md5: bdd7b6b60c2f0a4793e567b6c8f56245
+      md5: 38386e4e115c60e95755cf2a50d2cd3c
       size: 79

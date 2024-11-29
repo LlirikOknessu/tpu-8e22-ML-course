@@ -21,28 +21,11 @@ if __name__ == '__main__':
     real_n_student = scores['classroom'].value_counts()
     for i in range(scores.shape[0]):
         scores.at[i, 'n_student'] = real_n_student[scores.loc[i, 'classroom']]
-
-    # Новые признаки:
-    # 1. Фактор количества учеников в классе. Если > 23 0 иначе 1
-    scores['f_student_count'] = (scores['n_student'] < 23).map(int)
-
-    # 2. Комплексный фактор школы и наличия субсидий
-    comp = pd.crosstab([scores.school_type, scores.teaching_method],
-                       [scores.lunch, scores.school_setting],
-                       margins=True,
-                       values=scores.posttest,
-                       aggfunc='mean')
-    comp.stack(level=['lunch', 'school_setting'], future_stack=True)
-    comp.sort_values()
-    scores['f_complex'] = 0.0
-    indecies = ['school_type', 'teaching_method', 'lunch', 'school_setting']
-    for i in range(scores.shape[0]):
-        scores.at[i, 'f_complex'] = comp[tuple(scores.loc[i, indecies])]
-
-    # 3. Средний балл класса за предварительный тест
-    scores['f_class_mean'] = scores[['classroom',
-                                     'pretest']].groupby(['classroom'
-                                                          ]).transform('mean')
+    
+    scores['f_lunch'] = scores['lunch'].replace(['Qualifies for reduced/free lunch', 'Does not qualify'], [0, 1])
+    scores['f_teaching_method'] = scores['teaching_method'].replace(['Standard', 'Experimental'], [0, 1])
+    scores['f_school_setting'] = scores['school_setting'].replace(['Rural', 'Urban', 'Suburban'], [0, 1, 2])
+    scores['f_school_type'] = scores['school_type'].replace(['Public', 'Non-public'], [0, 1])
 
     # Экспортируем данные для обучения модели линейной регрессии
     scores = scores.select_dtypes(include=['number'])

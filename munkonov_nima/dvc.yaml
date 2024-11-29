@@ -10,7 +10,7 @@ stages:
     - path.raw_data
     - path.prepared_data
     outs:
-    - data/prepared
+    - ${path.prepared_data}
   train_model:
     cmd: python src/train_model.py
       -idp ${path.prepared_data}
@@ -22,7 +22,7 @@ stages:
       -s ${seed}
       -ts ${split}
     deps:
-    - data/prepared/prepared_data.csv
+    - ${path.prepared_data}
     - src/train_model.py
     params:
     - path.prepared_data
