@@ -1,8 +1,8 @@
 path:
   train_features: "data/prepared/train_features.csv"
   train_target: "data/prepared/train_target.csv"
-  test_features: "data/prepared/train_features.csv"
-  test_target: "data/prepared/train_target.csv"
+  test_features: "data/prepared/test_features.csv"
+  test_target: "data/prepared/test_target.csv"
   prepared_data: "data/prepared/prepared_data.csv"
   raw_data: "data/raw/test_scores.csv"
   output_model: "model/predictor.pickle"

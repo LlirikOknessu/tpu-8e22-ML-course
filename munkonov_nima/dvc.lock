@@ -18,13 +18,13 @@ stages:
     outs:
     - path: data/prepared
       hash: md5
-      md5: 3bafd63fb144f61131394b851dd10cd4.dir
-      size: 146475
-      nfiles: 4
+      md5: a6c96804db6247c9b4dc875381e2cfef.dir
+      size: 213518
+      nfiles: 6
   train_model:
     cmd: python src/train_model.py -idp data/prepared/prepared_data.csv -trfp data/prepared/train_features.csv
-      -tefp data/prepared/train_features.csv -trtp data/prepared/train_target.csv
-      -tetp data/prepared/train_target.csv -omp model/predictor.pickle -s 42 -ts 0.2
+      -tefp data/prepared/test_features.csv -trtp data/prepared/train_target.csv -tetp
+      data/prepared/test_target.csv -omp model/predictor.pickle -s 42 -ts 0.2
     deps:
     - path: data/prepared/prepared_data.csv
       hash: md5
@@ -38,8 +38,8 @@ stages:
       params.yaml:
         path.output_model: model/predictor.pickle
         path.prepared_data: data/prepared/prepared_data.csv
-        path.test_features: data/prepared/train_features.csv
-        path.test_target: data/prepared/train_target.csv
+        path.test_features: data/prepared/test_features.csv
+        path.test_target: data/prepared/test_target.csv
         path.train_features: data/prepared/train_features.csv
         path.train_target: data/prepared/train_target.csv
         seed: 42
@@ -50,25 +50,25 @@ stages:
       md5: 16d3eeb2bb0ce0008b626931e6f5e0df
       size: 609
   evaluate_model:
-    cmd: python src/evaluate_model.py -tp data/prepared/train_target.csv -fp data/prepared/train_features.csv
+    cmd: python src/evaluate_model.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
       -mp model/predictor.pickle -op metrics.json
     deps:
-    - path: data/prepared/train_features.csv
+    - path: data/prepared/test_features.csv
       hash: md5
       md5: 37b3197a4936bfac4fce77c47058ce4b
       size: 14406
+    - path: data/prepared/test_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
     - path: data/prepared/train_features.csv
       hash: md5
-      md5: 37b3197a4936bfac4fce77c47058ce4b
-      size: 14406
+      md5: 92161869ef5a4f8aed87e7a682719de4
+      size: 57506
     - path: data/prepared/train_target.csv
       hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
-    - path: data/prepared/train_target.csv
-      hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
+      md5: 20c47de9d054f731d6417d964f44313c
+      size: 9537
     - path: src/evaluate_model.py
       hash: md5
       md5: c2ad52506abc4736c28a0ffa526ced22
@@ -76,8 +76,8 @@ stages:
     params:
       params.yaml:
         path.metrics: metrics.json
-        path.test_features: data/prepared/train_features.csv
-        path.test_target: data/prepared/train_target.csv
+        path.test_features: data/prepared/test_features.csv
+        path.test_target: data/prepared/test_target.csv
         path.train_features: data/prepared/train_features.csv
         path.train_target: data/prepared/train_target.csv
     outs:
