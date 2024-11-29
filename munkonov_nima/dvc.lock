@@ -68,6 +68,10 @@ stages:
       hash: md5
       md5: 20c47de9d054f731d6417d964f44313c
       size: 9537
+    - path: model/predictor.pickle
+      hash: md5
+      md5: 497a27dfc8c4ee763db268f2807d6a18
+      size: 704
     - path: src/evaluate_model.py
       hash: md5
       md5: c2ad52506abc4736c28a0ffa526ced22

@@ -46,6 +46,7 @@ stages:
     - ${path.test_features}
     - ${path.train_target}
     - ${path.test_target}
+    - ${path.output_model}
     - src/evaluate_model.py
     params:
     - path.train_features
