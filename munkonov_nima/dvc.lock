@@ -44,6 +44,22 @@ stages:
         seed: 42
         split: 0.2
     outs:
+    - path: data/prepared/test_features.csv
+      hash: md5
+      md5: 324a424c9e2523450ed4077f8355e0bb
+      size: 13137
+    - path: data/prepared/test_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
+    - path: data/prepared/train_features.csv
+      hash: md5
+      md5: 15520c770da4b8b5fe20fb161ef67355
+      size: 52622
+    - path: data/prepared/train_target.csv
+      hash: md5
+      md5: 20c47de9d054f731d6417d964f44313c
+      size: 9537
     - path: model/predictor.pickle
       hash: md5
       md5: 497a27dfc8c4ee763db268f2807d6a18

@@ -35,6 +35,10 @@ stages:
     - split
     outs:
     - ${path.output_model}
+    - ${path.train_features}
+    - ${path.test_features}
+    - ${path.train_target}
+    - ${path.test_target}
   evaluate_model:
     cmd: python src/evaluate_model.py 
       -tp ${path.test_target}
