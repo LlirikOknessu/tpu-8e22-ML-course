@@ -1,0 +1,24 @@
+cmd: python linear_regression.py -id data/prepared -od data/models -mn LinearRegression
+deps:
+- path: data/prepared
+  hash: md5
+  md5: 08d1a9dfa2045d0581e8926f4b61f8f3.dir
+  size: 7155402
+  nfiles: 8
+- path: linear_regression.py
+  hash: md5
+  md5: 8fcba06eef567d19653e38d83c8b9d33
+  size: 2703
+params:
+  params.yaml:
+    linear_regression:
+      model_name: LinearRegression
+outs:
+- path: data/models/LinearRegression.csv
+  hash: md5
+  md5: 770c91b82f1ba95c803be9a7b140f897
+  size: 690
+- path: data/models/LinearRegression.joblib
+  hash: md5
+  md5: f337cdf7bfc902ac58e237cea2a59664
+  size: 1887

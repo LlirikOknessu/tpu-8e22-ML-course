@@ -1,0 +1,90 @@
+cmd: python decision_tree_prod_version.py -id data/prepared/ -od data/models/ -mn
+  ExtraTree
+deps:
+- path: data/models/ExtraTree.joblib
+  hash: md5
+  md5: a0aad3cd354f5b13e7ed8fa05482cf0c
+  size: 305615
+- path: data/prepared
+  hash: md5
+  md5: 3d814a0c4bd8db99f1262716dcae368d.dir
+  size: 5781138
+  nfiles: 8
+- path: decision_tree_prod_version.py
+  hash: md5
+  md5: b344cb2087ea66cd30d892b10e25822f
+  size: 3945
+params:
+  params.yaml:
+    decision_tree:
+      DecisionTree:
+        max_depth:
+        - 2
+        - 4
+        - 6
+        - 7
+        splitter:
+        - best
+        - random
+        min_samples_split:
+        - 2
+        - 3
+        - 4
+        min_samples_leaf:
+        - 1
+        - 2
+        - 3
+        - 4
+      RandomForest:
+        n_estimators:
+        - 1
+        - 2
+        - 5
+        - 10
+        - 15
+        max_depth:
+        - 2
+        - 4
+        - 6
+        - 7
+        min_samples_split:
+        - 2
+        - 3
+        - 4
+        - 6
+        - 7
+        min_samples_leaf:
+        - 1
+        - 2
+        - 3
+        - 4
+      ExtraTree:
+        n_estimators:
+        - 1
+        - 2
+        - 5
+        - 10
+        - 15
+        max_depth:
+        - 2
+        - 4
+        - 6
+        - 7
+        min_samples_split:
+        - 2
+        - 3
+        - 4
+        - 10
+        - 15
+        min_samples_leaf:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 18
+        - 48
+outs:
+- path: data/models/ExtraTree_prod.joblib
+  hash: md5
+  md5: 6ff7859f9534c487f1627861bc813119
+  size: 136417

@@ -1,0 +1,50 @@
+cmd: python catboost_prod_version.py -id data/prepared/ -od data/models/ -mn CatBoost_Prod
+deps:
+- path: catboost_prod_version.py
+  hash: md5
+  md5: 3c4009718649d1cd5b516a91ac16cbf7
+  size: 4495
+- path: data/models/CatBoost_Prod.joblib
+  hash: md5
+  md5: aaf67f9b9a18d46c9f6869762c985e9f
+  size: 176771
+- path: data/prepared
+  hash: md5
+  md5: 7b76e6b6921a7467a76479f41816fe8d.dir
+  size: 5392548
+  nfiles: 8
+params:
+  params.yaml:
+    catboost:
+      CatBoost:
+        iterations:
+        - 50
+        - 150
+        depth:
+        - 2
+        - 4
+        - 6
+        learning_rate:
+        - 0.01
+        - 0.05
+        - 0.1
+        l2_leaf_reg:
+        - 1
+        - 3
+        - 5
+        loss_function:
+        - RMSE
+        verbose:
+        - false
+      CatBoost_Prod:
+        iterations: 150
+        depth: 6
+        learning_rate: 0.05
+        l2_leaf_reg: 3
+        loss_function: RMSE
+        verbose: false
+outs:
+- path: data/models/CatBoost_Prod_prod.joblib
+  hash: md5
+  md5: 1261d3560aabe82ae4d58601813629d3
+  size: 176771

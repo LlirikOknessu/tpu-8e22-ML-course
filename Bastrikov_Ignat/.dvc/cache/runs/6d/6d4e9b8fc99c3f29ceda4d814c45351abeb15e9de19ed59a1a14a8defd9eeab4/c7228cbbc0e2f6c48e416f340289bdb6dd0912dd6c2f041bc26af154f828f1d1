@@ -1,0 +1,26 @@
+cmd: python data_preparation.py -id data/raw -od data/prepared -uf data/raw/rating.csv
+deps:
+- path: data/raw/anime.csv
+  hash: md5
+  md5: 6b818dcedb330301048770b5e3a5a1be
+  size: 870177
+- path: data/raw/rating.csv
+  hash: md5
+  md5: ba68088ca3b00b73b140d8e83914690d
+  size: 103606157
+- path: data_preparation.py
+  hash: md5
+  md5: 9fd6ae840f725b10be553cc5fcddf805
+  size: 10294
+params:
+  params.yaml:
+    data_preparation:
+      train_test_ratio: 0.8
+      train_val_ratio: 0.9
+      random_state: 42
+outs:
+- path: data/prepared
+  hash: md5
+  md5: 74f7e9ba4bcee1e21ee847b41aa43609.dir
+  size: 7639406
+  nfiles: 8

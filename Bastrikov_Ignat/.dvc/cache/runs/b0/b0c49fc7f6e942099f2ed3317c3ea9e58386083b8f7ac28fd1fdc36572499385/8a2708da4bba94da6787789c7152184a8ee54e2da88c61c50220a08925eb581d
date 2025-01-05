@@ -1,0 +1,29 @@
+cmd: python linear_regression_prod_version.py -id data/prepared/ -od data/models/
+  -mn LinearRegression
+deps:
+- path: data/models/LinearRegression.joblib
+  hash: md5
+  md5: 1ba9f6cd189837db95c8610ee3bfe990
+  size: 1775
+- path: data/prepared
+  hash: md5
+  md5: 9a19b57c4e5111edf90b41a9ebfc40e6.dir
+  size: 4976628
+  nfiles: 8
+- path: linear_regression_prod_version.py
+  hash: md5
+  md5: 97af72ae0c701e7d24be3c267b73c613
+  size: 3335
+params:
+  params.yaml:
+    linear_regression:
+      model_name: LinearRegression
+outs:
+- path: data/models/LinearRegression_prod.csv
+  hash: md5
+  md5: 8b09da014bfb9e9fa48ae45b72fd52b3
+  size: 650
+- path: data/models/LinearRegression_prod.joblib
+  hash: md5
+  md5: c83836bf683476f29300937290305f2a
+  size: 1775
