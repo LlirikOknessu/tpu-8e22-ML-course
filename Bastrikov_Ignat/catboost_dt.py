@@ -71,8 +71,13 @@ if __name__ == '__main__':
     mae_baseline = mean_absolute_error(y_test, y_pred_baseline)
     mae_catboost = mean_absolute_error(y_test, y_pred_catboost)
 
-    mae = pd.DataFrame(abs(y_test - y_pred_catboost))
-    mae.to_csv(".\data\prepared\mae_res.csv", index=False)
+    mae_res = pd.DataFrame({
+        'true_values': y_test,
+        'predicted_values': y_pred_catboost,
+        'difference': abs(y_test - y_pred_catboost)
+    })
+
+    mae_res.to_csv(".\data\prepared\mae_res.csv", index=False)
     print("Mae для каждого столбика сохранен в data\prepared")
 
     print(f"Модель CatBoost ({args.model_name})")

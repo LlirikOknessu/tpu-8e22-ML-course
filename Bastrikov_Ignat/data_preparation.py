@@ -116,9 +116,19 @@ def clean_data(df: pd.DataFrame, df_users: pd.DataFrame) -> pd.DataFrame:
     # Ultra new super features - hopes die last...
     df['episodes_per_type'] = df['episodes'] / df['anime_count_by_type'] # Плотность серий(отслеживать уникальные типо)
     df['type_user_activity_ratio'] = df['user_activity'] / df['anime_count_by_type'] # активность по типу аниме
+    # try more
+    df['genre_count'] = df['genre'].apply(lambda x: len(x) if isinstance(x, list) else 0) # cчетчик жанров
+    df['total_rated'] = df_users.groupby('anime_id').size() # количество людей оценивших впринципе
+    df['total_rated'] = df['anime_id'].map(df['total_rated']).fillna(0)
+    # количество людей поставивших максимальную оценку
+    max_rating = df_users['rating'].max()
+    df['favourite_count'] = df_users[df_users['rating'] == max_rating].groupby('anime_id').size()
+    df['favourite_count'] = df['anime_id'].map(df['favourite_count']).fillna(0)
+    # количество слов
+    df['word_count'] = df['name'].str.split().str.len()
 
     # logirovanie
-    df['log_members'] = np.log(df['members'] + 1)  # Добавляем 1, чтобы избежать log(0)
+    df['log_members'] = np.log(df['members'] + 1)  # Доавляем 1, чтобы избежать log(0)
     df['log_episodes'] = np.log(df['episodes'] + 1)
     df['log_len_of_title'] = np.log(df['len_of_title'] + 1)
     df['log_avg_members_genre'] = np.log(df['avg_members_genre'] + 1)
@@ -126,8 +136,12 @@ def clean_data(df: pd.DataFrame, df_users: pd.DataFrame) -> pd.DataFrame:
     df['log_anime_count_by_type'] = np.log(df['anime_count_by_type'] + 1)
     df['log_avg_rating_by_type'] = np.log(df['avg_rating_by_type'] + 1)
     df['log_user_activity'] = np.log(df['user_activity'] + 1)
+    df['log_genre_count'] = np.log(df['genre_count'] + 1)
+    df['log_total_rated'] = np.log(df['total_rated'] + 1)
+    df['log_favourite_count'] = np.log(df['favourite_count'] + 1)
+    df['log_word_count'] = np.log(df['word_count'] + 1)
 
-    df.drop(["name", "genre", "anime_id", "members", "avg_members_genre", "episodes", "len_of_title", "anime_count_by_type", "avg_rating_by_type", "episode_density", 'user_activity'], axis=1, inplace=True)
+    df.drop(["name", "genre", "anime_id", "members", "avg_members_genre", "episodes", "len_of_title", "anime_count_by_type", "avg_rating_by_type", "episode_density", 'user_activity', "genre_count", "total_rated", "favourite_count", "word_count"], axis=1, inplace=True)
     df = one_hot_encode(df, 'type')
     print("\nПропущенные значения после обработки:")
     print(df.isnull().sum())  # Вывод количества пропущенных значений после обработки
