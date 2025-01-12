@@ -86,10 +86,16 @@ def add_genre_categories(df):
         'Psychological/Thriller': ['Psychological', 'Thriller', 'Mystery', 'Dementia'],
         'Other/Uncategorized': ['Kids', 'Hentai', 'Yaoi', 'Yuri', 'Ecchi', 'unknown']
     }
-    df['genre'] = df['genre'].apply(lambda x: [genre.strip() for genre in x] if isinstance(x, str) else []) #Обработка пустых значений
-    categories_df = df['genre'].apply(map_genres_to_categories, genre_categories=genre_categories)
+    df['genre'] = df['genre'].fillna('unknown').apply(
+        lambda x: [genre.strip() for genre in x.split(',')] if isinstance(x, str) else []
+    )
+    categories_df = df['genre'].apply(lambda genres: map_genres_to_categories(genres, genre_categories))
     categories_df = pd.DataFrame(categories_df.tolist(), index=df.index)
     df = pd.concat([df, categories_df], axis=1)
+    #df['genre'] = df['genre'].apply(lambda x: [genre.strip() for genre in x] if isinstance(x, str) else []) #Обработка пустых значений
+    #categories_df = df['genre'].apply(map_genres_to_categories, genre_categories=genre_categories)
+    #categories_df = pd.DataFrame(categories_df.tolist(), index=df.index)
+    #df = pd.concat([df, categories_df], axis=1)
     return df
 
 
@@ -140,8 +146,7 @@ def clean_data(df: pd.DataFrame, df_users: pd.DataFrame) -> pd.DataFrame:
     df['log_total_rated'] = np.log(df['total_rated'] + 1)
     df['log_favourite_count'] = np.log(df['favourite_count'] + 1)
     df['log_word_count'] = np.log(df['word_count'] + 1)
-
-    df.drop(["name", "genre", "anime_id", "members", "avg_members_genre", "episodes", "len_of_title", "anime_count_by_type", "avg_rating_by_type", "episode_density", 'user_activity', "genre_count", "total_rated", "favourite_count", "word_count"], axis=1, inplace=True)
+    df.drop(["name","genre", "anime_id", "members", "avg_members_genre", "episodes", "len_of_title", "anime_count_by_type", "avg_rating_by_type", "episode_density", 'user_activity', "genre_count", "total_rated", "favourite_count", "word_count"], axis=1, inplace=True)
     df = one_hot_encode(df, 'type')
     print("\nПропущенные значения после обработки:")
     print(df.isnull().sum())  # Вывод количества пропущенных значений после обработки
