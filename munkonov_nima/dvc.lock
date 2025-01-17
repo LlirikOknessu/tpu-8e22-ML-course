@@ -2,6 +2,9 @@ schema: '2.0'
 stages:
   prepare_data:
     cmd: python src/prepare_data.py -ip data/raw/test_scores.csv -op data/prepared/prepared_data.csv
+      -tetp data/prepared/test_target.csv -tefp data/prepared/test_features.csv -trtp
+      data/prepared/train_target.csv -trfp data/prepared/train_features.csv -ftp data/prepared/full_target.csv
+      -ffp data/prepared/full_features.csv -s 42 -ts 0.2
     deps:
     - path: data/raw/test_scores.csv
       hash: md5
@@ -9,17 +12,59 @@ stages:
       size: 171367
     - path: src/prepare_data.py
       hash: md5
-      md5: a0cbc6094878340044b154832ca75fb3
-      size: 1754
+      md5: 6a91677019689cfa60c27a5aea29288b
+      size: 3030
     params:
       params.yaml:
-        path.prepared_data: data/prepared/prepared_data.csv
-        path.raw_data: data/raw/test_scores.csv
+        path:
+          train_features: data/prepared/train_features.csv
+          train_target: data/prepared/train_target.csv
+          test_features: data/prepared/test_features.csv
+          test_target: data/prepared/test_target.csv
+          full_features: data/prepared/full_features.csv
+          full_target: data/prepared/full_target.csv
+          prepared_data: data/prepared/prepared_data.csv
+          raw_data: data/raw/test_scores.csv
+          lr_model: model/linear_regressor.pickle
+          dt_model: model/decision_tree.pickle
+          cb_model: model/cat_boost.pickle
+          lr_model_prod: model/linear_regressor_prod.pickle
+          dt_model_prod: model/decision_tree_prod.pickle
+          cb_model_prod: model/cat_boost_prod.pickle
+          lr_metrics: lr_metics.json
+          dt_metrics: dt_metrics.json
+          cb_metrics: cb_metrics.json
+        seed: 42
+        split: 0.2
     outs:
+    - path: data/prepared/full_features.csv
+      hash: md5
+      md5: 047518bfbdf584e9dc58f53c63cd8d42
+      size: 65837
+    - path: data/prepared/full_target.csv
+      hash: md5
+      md5: c6f9d88ad0bc5c1783f61441ce494aa3
+      size: 11921
     - path: data/prepared/prepared_data.csv
       hash: md5
       md5: 3b850faccee1754b4ae41cf05db7cf12
       size: 75773
+    - path: data/prepared/test_features.csv
+      hash: md5
+      md5: 1fcb0c6ad256cf005f0fad718309c565
+      size: 13164
+    - path: data/prepared/test_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
+    - path: data/prepared/train_features.csv
+      hash: md5
+      md5: 369446098d33b3bd5c7c684c4dcc254f
+      size: 52762
+    - path: data/prepared/train_target.csv
+      hash: md5
+      md5: 20c47de9d054f731d6417d964f44313c
+      size: 9537
   train_model:
     cmd: python src/train_model.py -idp data/prepared/prepared_data.csv -trfp data/prepared/train_features.csv
       -tefp data/prepared/test_features.csv -trtp data/prepared/train_target.csv -tetp
@@ -104,3 +149,216 @@ stages:
       hash: md5
       md5: f51d01f1001c318803461940f080621f
       size: 78
+  train_LR:
+    cmd: python src/train_LR.py -fp data/prepared/train_features.csv -tp data/prepared/train_target.csv
+      -omp model/linear_regressor.pickle
+    deps:
+    - path: data/prepared/train_features.csv
+      hash: md5
+      md5: 369446098d33b3bd5c7c684c4dcc254f
+      size: 52762
+    - path: data/prepared/train_target.csv
+      hash: md5
+      md5: 20c47de9d054f731d6417d964f44313c
+      size: 9537
+    - path: src/train_LR.py
+      hash: md5
+      md5: 4628ea85e9385a7495322fe428b3d20c
+      size: 1021
+    params:
+      params.yaml:
+        path:
+          train_features: data/prepared/train_features.csv
+          train_target: data/prepared/train_target.csv
+          test_features: data/prepared/test_features.csv
+          test_target: data/prepared/test_target.csv
+          full_features: data/prepared/full_features.csv
+          full_target: data/prepared/full_target.csv
+          prepared_data: data/prepared/prepared_data.csv
+          raw_data: data/raw/test_scores.csv
+          lr_model: model/linear_regressor.pickle
+          dt_model: model/decision_tree.pickle
+          cb_model: model/cat_boost.pickle
+          lr_model_prod: model/linear_regressor_prod.pickle
+          dt_model_prod: model/decision_tree_prod.pickle
+          cb_model_prod: model/cat_boost_prod.pickle
+          lr_metrics: lr_metics.json
+          dt_metrics: dt_metrics.json
+          cb_metrics: cb_metrics.json
+    outs:
+    - path: model/linear_regressor.pickle
+      hash: md5
+      md5: 9d85edb1727df9034ab71e9d1372d625
+      size: 715
+  evaluate_LR:
+    cmd: python src/evaluate_LR.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
+      -mp model/linear_regressor.pickle -op lr_metics.json
+    deps:
+    - path: data/prepared/test_features.csv
+      hash: md5
+      md5: 1fcb0c6ad256cf005f0fad718309c565
+      size: 13164
+    - path: data/prepared/test_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
+    - path: model/linear_regressor.pickle
+      hash: md5
+      md5: 9d85edb1727df9034ab71e9d1372d625
+      size: 715
+    - path: src/evaluate_LR.py
+      hash: md5
+      md5: c2ad52506abc4736c28a0ffa526ced22
+      size: 1246
+    params:
+      params.yaml:
+        path:
+          train_features: data/prepared/train_features.csv
+          train_target: data/prepared/train_target.csv
+          test_features: data/prepared/test_features.csv
+          test_target: data/prepared/test_target.csv
+          full_features: data/prepared/full_features.csv
+          full_target: data/prepared/full_target.csv
+          prepared_data: data/prepared/prepared_data.csv
+          raw_data: data/raw/test_scores.csv
+          lr_model: model/linear_regressor.pickle
+          dt_model: model/decision_tree.pickle
+          cb_model: model/cat_boost.pickle
+          lr_model_prod: model/linear_regressor_prod.pickle
+          dt_model_prod: model/decision_tree_prod.pickle
+          cb_model_prod: model/cat_boost_prod.pickle
+          lr_metrics: lr_metics.json
+          dt_metrics: dt_metrics.json
+          cb_metrics: cb_metrics.json
+    outs:
+    - path: lr_metics.json
+      hash: md5
+      md5: f51d01f1001c318803461940f080621f
+      size: 78
+  prod_LR:
+    cmd: python src/train_LR.py -fp data/prepared/full_features.csv -tp data/prepared/full_target.csv
+      -omp model/linear_regressor_prod.pickle
+    deps:
+    - path: data/prepared/full_features.csv
+      hash: md5
+      md5: 047518bfbdf584e9dc58f53c63cd8d42
+      size: 65837
+    - path: data/prepared/full_target.csv
+      hash: md5
+      md5: c6f9d88ad0bc5c1783f61441ce494aa3
+      size: 11921
+    - path: src/train_LR.py
+      hash: md5
+      md5: 4628ea85e9385a7495322fe428b3d20c
+      size: 1021
+    params:
+      params.yaml:
+        path:
+          train_features: data/prepared/train_features.csv
+          train_target: data/prepared/train_target.csv
+          test_features: data/prepared/test_features.csv
+          test_target: data/prepared/test_target.csv
+          full_features: data/prepared/full_features.csv
+          full_target: data/prepared/full_target.csv
+          prepared_data: data/prepared/prepared_data.csv
+          raw_data: data/raw/test_scores.csv
+          lr_model: model/linear_regressor.pickle
+          dt_model: model/decision_tree.pickle
+          cb_model: model/cat_boost.pickle
+          lr_model_prod: model/linear_regressor_prod.pickle
+          dt_model_prod: model/decision_tree_prod.pickle
+          cb_model_prod: model/cat_boost_prod.pickle
+          lr_metrics: lr_metics.json
+          dt_metrics: dt_metrics.json
+          cb_metrics: cb_metrics.json
+    outs:
+    - path: model/linear_regressor_prod.pickle
+      hash: md5
+      md5: 68d62543c6d24b05959fbad47310d8d9
+      size: 715
+  train_DT:
+    cmd: python src/train_DT.py -fp data/prepared/train_features.csv -tp data/prepared/train_target.csv
+      -omp model/decision_tree.pickle -p params.yaml
+    deps:
+    - path: data/prepared/train_features.csv
+      hash: md5
+      md5: 369446098d33b3bd5c7c684c4dcc254f
+      size: 52762
+    - path: data/prepared/train_target.csv
+      hash: md5
+      md5: 20c47de9d054f731d6417d964f44313c
+      size: 9537
+    - path: src/train_DT.py
+      hash: md5
+      md5: 968cf499ffaf3f104806d2090aed539b
+      size: 2514
+    params:
+      params.yaml:
+        path:
+          train_features: data/prepared/train_features.csv
+          train_target: data/prepared/train_target.csv
+          test_features: data/prepared/test_features.csv
+          test_target: data/prepared/test_target.csv
+          full_features: data/prepared/full_features.csv
+          full_target: data/prepared/full_target.csv
+          prepared_data: data/prepared/prepared_data.csv
+          raw_data: data/raw/test_scores.csv
+          lr_model: model/linear_regressor.pickle
+          dt_model: model/decision_tree.pickle
+          cb_model: model/cat_boost.pickle
+          lr_model_prod: model/linear_regressor_prod.pickle
+          dt_model_prod: model/decision_tree_prod.pickle
+          cb_model_prod: model/cat_boost_prod.pickle
+          lr_metrics: lr_metics.json
+          dt_metrics: dt_metrics.json
+          cb_metrics: cb_metrics.json
+    outs:
+    - path: model/decision_tree.pickle
+      hash: md5
+      md5: 511d8658a770a51271ca38d16c1bf018
+      size: 24550
+  evaluate_DT:
+    cmd: python src/evaluate_DT.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
+      -mp model/decision_tree.pickle -op dt_metrics.json
+    deps:
+    - path: data/prepared/test_features.csv
+      hash: md5
+      md5: 1fcb0c6ad256cf005f0fad718309c565
+      size: 13164
+    - path: data/prepared/test_target.csv
+      hash: md5
+      md5: afcba19219240ba2afaf22d924fb5eaf
+      size: 2394
+    - path: model/decision_tree.pickle
+      hash: md5
+      md5: 511d8658a770a51271ca38d16c1bf018
+      size: 24550
+    - path: src/evaluate_DT.py
+      hash: md5
+      md5: 99fab36405dfa6130075de00799a3843
+      size: 3255
+    params:
+      params.yaml:
+        path:
+          train_features: data/prepared/train_features.csv
+          train_target: data/prepared/train_target.csv
+          test_features: data/prepared/test_features.csv
+          test_target: data/prepared/test_target.csv
+          full_features: data/prepared/full_features.csv
+          full_target: data/prepared/full_target.csv
+          prepared_data: data/prepared/prepared_data.csv
+          raw_data: data/raw/test_scores.csv
+          lr_model: model/linear_regressor.pickle
+          dt_model: model/decision_tree.pickle
+          cb_model: model/cat_boost.pickle
+          lr_model_prod: model/linear_regressor_prod.pickle
+          dt_model_prod: model/decision_tree_prod.pickle
+          cb_model_prod: model/cat_boost_prod.pickle
+          lr_metrics: lr_metics.json
+          dt_metrics: dt_metrics.json
+          cb_metrics: cb_metrics.json
+    outs:
+    - path: dt_metrics.json
+      hash: md5
+      md5: 2e26cf7ea146a9b6ab39c5540e4d021e
+      size: 79

@@ -1,62 +1,124 @@
 stages:
+
+# -----------< Data preparation >-----------
   prepare_data:
     cmd: python src/prepare_data.py
       -ip ${path.raw_data}
       -op ${path.prepared_data}
+      -tetp ${path.test_target}
+      -tefp ${path.test_features}
+      -trtp ${path.train_target}
+      -trfp ${path.train_features}
+      -ftp ${path.full_target}
+      -ffp ${path.full_features}
+      -s ${seed}
+      -ts ${split}
     deps:
     - ${path.raw_data}
     - src/prepare_data.py
     params:
-    - path.raw_data
-    - path.prepared_data
-    outs:
-    - ${path.prepared_data}
-  train_model:
-    cmd: python src/train_model.py
-      -idp ${path.prepared_data}
-      -trfp ${path.train_features}
-      -tefp ${path.test_features}
-      -trtp ${path.train_target}
-      -tetp ${path.test_target}
-      -omp ${path.output_model}
-      -s ${seed}
-      -ts ${split}
-    deps:
-    - ${path.prepared_data}
-    - src/train_model.py
-    params:
-    - path.prepared_data
-    - path.train_features
-    - path.test_features
-    - path.train_target
-    - path.test_target
-    - path.output_model
+    - path
     - seed
     - split
     outs:
-    - ${path.output_model}
+    - ${path.prepared_data}
     - ${path.train_features}
     - ${path.test_features}
     - ${path.train_target}
     - ${path.test_target}
-  evaluate_model:
-    cmd: python src/evaluate_model.py 
+    - ${path.full_features}
+    - ${path.full_target}
+
+
+# -----------< Linear regression >-----------
+  train_LR:
+    cmd: python src/train_LR.py
+      -fp ${path.train_features}
+      -tp ${path.train_target}
+      -omp ${path.lr_model}
+    deps:
+    - src/train_LR.py
+    - ${path.train_features}
+    - ${path.train_target}
+    params:
+    - path
+    outs:
+    - ${path.lr_model}
+
+  evaluate_LR:
+    cmd: python src/evaluate_LR.py 
       -tp ${path.test_target}
       -fp ${path.test_features}
-      -mp ${path.output_model}
-      -op ${path.metrics}
+      -mp ${path.lr_model}
+      -op ${path.lr_metrics}
     deps:
-    - ${path.train_features}
+    - src/evaluate_LR.py
     - ${path.test_features}
-    - ${path.train_target}
     - ${path.test_target}
-    - ${path.output_model}
-    - src/evaluate_model.py
+    - ${path.lr_model}
     params:
-    - path.train_features
-    - path.test_features
-    - path.train_target
-    - path.test_target
-    - path.metrics
+    - path
     metrics:
-    - ${path.metrics}
+    - ${path.lr_metrics}
+
+  prod_LR:
+    cmd: python src/train_LR.py
+      -fp ${path.full_features}
+      -tp ${path.full_target}
+      -omp ${path.lr_model_prod}
+    deps:
+    - src/train_LR.py
+    - ${path.full_target}
+    - ${path.full_features}
+    params:
+    - path
+    outs:
+    - ${path.lr_model_prod}
+
+
+# -----------< Decision tree >-----------
+  train_DT:
+    cmd: python src/train_DT.py
+      -fp ${path.train_features}
+      -tp ${path.train_target}
+      -omp ${path.dt_model}
+      -p params.yaml
+    deps:
+    - src/train_DT.py
+    - ${path.train_features}
+    - ${path.train_target}
+    params:
+    - path
+    outs:
+    - ${path.dt_model}
+
+  evaluate_DT:
+    cmd: python src/evaluate_DT.py 
+      -tp ${path.test_target}
+      -fp ${path.test_features}
+      -mp ${path.dt_model}
+      -op ${path.dt_metrics}
+    deps:
+    - src/evaluate_DT.py
+    - ${path.test_features}
+    - ${path.test_target}
+    - ${path.dt_model}
+    params:
+    - path
+    metrics:
+    - ${path.dt_metrics}
+
+  prod_DT:
+    cmd: python src/train_DT.py
+      -fp ${path.full_features}
+      -tp ${path.full_target}
+      -omp ${path.dt_model_prod}
+    deps:
+    - src/train_dt.py
+    - ${path.full_target}
+    - ${path.full_features}
+    params:
+    - path
+    outs:
+    - ${path.dt_model_prod}
+
