@@ -33,10 +33,10 @@ catboost:
     learning_rate: 0.1 #[0.01,0.1,0.2] 
     l2_leaf_reg: 2 #[1,2,3,4,5] 
 
-# neuralnet:
-#   model_name: 'NeuralNet'
-#   epochs: 600
-#   learning_rate: 0.005
-#   neurons: 64
-#   inputs: 4
+neuralnet:
+  model_name: 'NeuralNet'
+  epochs: 600
+  learning_rate: 0.005
+  neurons: 64
+  inputs: 4
   
