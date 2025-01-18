@@ -67,6 +67,7 @@ if __name__ == '__main__':
     mae_baseline = mean_absolute_error(y_test, y_pred_baseline)
     mae_catboost = mean_absolute_error(y_test, y_pred_catboost)
 
+    print(grid_search.score(X_test,y_test))
     print(f"Модель CatBoost ")
     print("-------------------------------")
     print(f"средння абсолютная ошибка линейной регресси: {mae_baseline:.4f}")

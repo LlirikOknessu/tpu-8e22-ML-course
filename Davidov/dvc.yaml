@@ -20,6 +20,7 @@ stages:
       - data/models/${linear_regression.model_name}.joblib
     params:
       - linear_regression
+    always_changed: true
 
   linear_regression_validation:
     cmd: python linear_regression_validation.py -id data/prepared/ -im data/models/${linear_regression.model_name}.joblib -mn ${linear_regression.model_name}
@@ -29,6 +30,7 @@ stages:
       - data/models/${linear_regression.model_name}.joblib
     params:
       - linear_regression
+    always_changed: true
 
   linear_regression_prod_version:
     cmd: python linear_regression_prod_version.py -id data/prepared/ -od data/models/ -mn ${linear_regression.model_name}
@@ -55,6 +57,7 @@ stages:
       params:
         - decision_tree
       #always_changed: true
+      always_changed: true
   
   decision_tree_validation:
     foreach: ${decision_tree}
@@ -67,6 +70,7 @@ stages:
         - data/models/${linear_regression.model_name}_prod.joblib
       params:
         - decision_tree
+      always_changed: true
 
   decision_tree_prod_version:
     foreach: ${decision_tree}
@@ -94,6 +98,8 @@ stages:
         - data/models/${key}.joblib
       params:
         - catboost
+      always_changed: true
+      
   catboost_validation:
     foreach: ${catboost}
     do:
@@ -105,6 +111,8 @@ stages:
         - data/models/${linear_regression.model_name}_prod.joblib
       params:
         - catboost
+      always_changed: true
+      
   catboost_prod_version:
     foreach: ${catboost}
     do:
@@ -117,3 +125,14 @@ stages:
         - data/models/${key}_prod.joblib
       params:
         - catboost
+
+  # neural_net:
+  #     cmd: python NN.py -id data/prepared -od data/models -bm -mn ${neuralnet.model_name} -p params.yaml
+  #     deps:
+  #       - NN.py
+  #       - data/prepared
+        
+  #     outs:
+  #       - data/models/${neuralnet.model_name}_prod.joblib
+  #     params:
+  #       - neuralnet

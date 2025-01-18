@@ -68,6 +68,7 @@ if __name__ == '__main__':
 
     predicted_values = np.squeeze(decision_tree_regressor.predict(X_test))
 
+
     print(decision_tree_regressor.score(X_test, y_test))
     print(decision_tree_regressor.best_params_)
 

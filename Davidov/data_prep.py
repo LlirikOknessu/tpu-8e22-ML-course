@@ -1,9 +1,16 @@
 import pandas as pd
+from sklearn import preprocessing
 import argparse
 from pathlib import Path
 import yaml
 import numpy as np
 from sklearn.model_selection import train_test_split
+
+def normalize(df:pd.DataFrame):#
+    min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(df)
+    df = pd.DataFrame(x_scaled)
+    return df
 
 def parser_args_for_sac():
     parser = argparse.ArgumentParser(description='Paths parser')
@@ -57,7 +64,10 @@ if __name__=="__main__":
         full_data = new_features(prev_data)
         cleaned_data=clean_data(df=full_data)
 
-        X, y = cleaned_data.drop("charges", axis=1), cleaned_data['charges']
+        # normilized_data=normalize(cleaned_data)
+
+        # X, y = normilized_data.drop(2, axis=1), normilized_data[2]#
+        X, y = cleaned_data.drop("charges", axis=1), cleaned_data["charges"]
         X_train , X_test, y_train, y_test = train_test_split(X, y,
                                                             train_size=params.get('train_test_ratio'),
                                                             random_state=params.get('random_state'))

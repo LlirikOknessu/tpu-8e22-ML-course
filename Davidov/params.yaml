@@ -23,12 +23,20 @@ decision_tree:
     
 catboost:
   TrainCatBoost:
-    iterations: [100,200,300]
-    depth: [4,6,8,10]
-    learning_rate: [0.01,0.1,0.2] 
-    l2_leaf_reg: [1,2,3,4,5] 
+    iterations: [200] #[100,200,300]
+    depth: [4] #[4,6,8,10]
+    learning_rate: [0.2] #[0.01,0.1,0.2] 
+    l2_leaf_reg: [2] #[1,2,3,4,5] 
   ProdCatBoost:
     iterations: 100 #[100,200,300]
     depth: 4 #[4,6,8,10]
     learning_rate: 0.1 #[0.01,0.1,0.2] 
     l2_leaf_reg: 2 #[1,2,3,4,5] 
+
+# neuralnet:
+#   model_name: 'NeuralNet'
+#   epochs: 600
+#   learning_rate: 0.005
+#   neurons: 64
+#   inputs: 4
+  
