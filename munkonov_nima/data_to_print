@@ -1,0 +1,21 @@
+Модель CatBoost (CatBoost)
+--------------< >--------------
+Score: -2.2663
+Лучшие параметры: {'depth': 6, 'iterations': 100, 'l2_leaf_reg': 10, 'learning_rate': 0.1, 'loss_function': 'RMSE', 'verbose': False}
+Baseline MAE: 2.2442
+Model MAE: 2.4082
+outliers count: 290
+mae_res count: 397
+% of outliers 73.04785894206549
+--------------< >--------------
+
+MAE: 2.1482
+MSE: 7.3676
+R² Score: 0.9619
+Признак: n_student, важность: 1.24
+Признак: pretest, важность: 34.40
+Признак: f_lunch, важность: 3.91
+Признак: f_teaching_method, важность: 11.92
+Признак: f_school_setting, важность: 1.75
+Признак: f_school_type, важность: 2.82
+Признак: f_class_mean, важность: 43.97

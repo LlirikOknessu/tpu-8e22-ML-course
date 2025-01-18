@@ -1,124 +1,111 @@
 stages:
-
-# -----------< Data preparation >-----------
-  prepare_data:
-    cmd: python src/prepare_data.py
-      -ip ${path.raw_data}
-      -op ${path.prepared_data}
-      -tetp ${path.test_target}
-      -tefp ${path.test_features}
-      -trtp ${path.train_target}
-      -trfp ${path.train_features}
-      -ftp ${path.full_target}
-      -ffp ${path.full_features}
-      -s ${seed}
-      -ts ${split}
+  data_preparation:
+    cmd: python data_preparation.py -id data/raw -od data/prepared -uf data/raw/test_scores.csv
     deps:
-    - ${path.raw_data}
-    - src/prepare_data.py
-    params:
-    - path
-    - seed
-    - split
+      - data_preparation.py
+      - data/raw
+      - data/raw/test_scores.csv
     outs:
-    - ${path.prepared_data}
-    - ${path.train_features}
-    - ${path.test_features}
-    - ${path.train_target}
-    - ${path.test_target}
-    - ${path.full_features}
-    - ${path.full_target}
-
-
-# -----------< Linear regression >-----------
-  train_LR:
-    cmd: python src/train_LR.py
-      -fp ${path.train_features}
-      -tp ${path.train_target}
-      -omp ${path.lr_model}
-    deps:
-    - src/train_LR.py
-    - ${path.train_features}
-    - ${path.train_target}
+      - data/prepared
     params:
-    - path
+      - data_preparation
+  linear_regression:
+    cmd: python linear_regression.py -id data/prepared -od data/models -mn ${linear_regression.model_name}
+    deps:
+      - linear_regression.py
+      - data/prepared
     outs:
-    - ${path.lr_model}
-
-  evaluate_LR:
-    cmd: python src/evaluate_LR.py 
-      -tp ${path.test_target}
-      -fp ${path.test_features}
-      -mp ${path.lr_model}
-      -op ${path.lr_metrics}
-    deps:
-    - src/evaluate_LR.py
-    - ${path.test_features}
-    - ${path.test_target}
-    - ${path.lr_model}
+      - data/models/${linear_regression.model_name}.csv
+      - data/models/${linear_regression.model_name}.joblib
     params:
-    - path
-    metrics:
-    - ${path.lr_metrics}
-
-  prod_LR:
-    cmd: python src/train_LR.py
-      -fp ${path.full_features}
-      -tp ${path.full_target}
-      -omp ${path.lr_model_prod}
+      - linear_regression
+  linear_regression_validation:
+    cmd: python linear_regression_validation.py -id data/prepared/ -im data/models/${linear_regression.model_name}.joblib -mn ${linear_regression.model_name}
     deps:
-    - src/train_LR.py
-    - ${path.full_target}
-    - ${path.full_features}
+      - linear_regression_validation.py
+      - data/prepared/
+      - data/models/${linear_regression.model_name}.joblib
     params:
-    - path
+      - linear_regression
+  linear_regression_prod:
+    cmd: python linear_regression_prod.py -id data/prepared/ -od data/models/ -mn ${linear_regression.model_name}
+    deps:
+      - linear_regression_prod.py
+      - data/prepared
+      - data/models/${linear_regression.model_name}.joblib
     outs:
-    - ${path.lr_model_prod}
-
-
-# -----------< Decision tree >-----------
-  train_DT:
-    cmd: python src/train_DT.py
-      -fp ${path.train_features}
-      -tp ${path.train_target}
-      -omp ${path.dt_model}
-      -p params.yaml
-    deps:
-    - src/train_DT.py
-    - ${path.train_features}
-    - ${path.train_target}
+      - data/models/${linear_regression.model_name}_prod.csv
+      - data/models/${linear_regression.model_name}_prod.joblib
     params:
-    - path
-    outs:
-    - ${path.dt_model}
-
-  evaluate_DT:
-    cmd: python src/evaluate_DT.py 
-      -tp ${path.test_target}
-      -fp ${path.test_features}
-      -mp ${path.dt_model}
-      -op ${path.dt_metrics}
-    deps:
-    - src/evaluate_DT.py
-    - ${path.test_features}
-    - ${path.test_target}
-    - ${path.dt_model}
-    params:
-    - path
-    metrics:
-    - ${path.dt_metrics}
-
-  prod_DT:
-    cmd: python src/train_DT.py
-      -fp ${path.full_features}
-      -tp ${path.full_target}
-      -omp ${path.dt_model_prod}
-    deps:
-    - src/train_dt.py
-    - ${path.full_target}
-    - ${path.full_features}
-    params:
-    - path
-    outs:
-    - ${path.dt_model_prod}
-
+      - linear_regression
+  decision_tree:
+    foreach: ${decision_tree}
+    do:
+      cmd: python decision_tree.py -id data/prepared -od data/models -bm data/models/${linear_regression.model_name}_prod.joblib -mn ${key} -p params.yaml
+      deps:
+        - decision_tree.py
+        - data/prepared
+        - data/models/${linear_regression.model_name}_prod.joblib
+      outs:
+        - data/models/${key}.joblib
+      params:
+        - decision_tree
+  decision_tree_validation:
+    foreach: ${decision_tree}
+    do:
+      cmd: python decision_tree_validation.py -id data/prepared/ -im data/models/${key}.joblib -bm data/models/${linear_regression.model_name}_prod.joblib -mn ${key}
+      deps:
+        - decision_tree_validation.py
+        - data/prepared/
+        - data/models/${key}.joblib
+        - data/models/${linear_regression.model_name}_prod.joblib
+      params:
+        - decision_tree
+  decision_tree_prod:
+    foreach: ${decision_tree}
+    do:
+      cmd: python decision_tree_prod.py -id data/prepared/ -od data/models/ -mn ${key}
+      deps:
+        - decision_tree_prod.py
+        - data/prepared
+        - data/models/${key}.joblib
+      outs:
+        - data/models/${key}_prod.joblib
+      params:
+        - decision_tree
+  catboost:
+    foreach: ${catboost}
+    do:
+      cmd: python catboost_dt.py -id data/prepared -od data/models -bm data/models/${linear_regression.model_name}_prod.joblib -mn ${key}
+      deps:
+        - catboost_dt.py
+        - data/prepared
+        - data/models/${linear_regression.model_name}_prod.joblib
+      outs:
+        - data/models/${key}.joblib
+      params:
+        - catboost
+      always_changed: true
+  catboost_validation:
+    foreach: ${catboost}
+    do:
+      cmd: python catboost_validation.py -id data/prepared/ -mp data/models/${key}.joblib -bm data/models/${linear_regression.model_name}_prod.joblib -mn ${key}
+      deps:
+        - catboost_validation.py
+        - data/prepared/
+        - data/models/${key}.joblib
+        - data/models/${linear_regression.model_name}_prod.joblib
+      params:
+        - catboost
+  catboost_prod:
+    foreach: ${catboost}
+    do:
+      cmd: python catboost_prod.py -id data/prepared/ -od data/models/ -mn ${key}
+      deps:
+        - catboost_prod.py
+        - data/prepared
+        - data/models/${key}.joblib
+      outs:
+        - data/models/${key}_prod.joblib
+      params:
+        - catboost

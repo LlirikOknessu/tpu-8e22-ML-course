@@ -1,364 +1,1624 @@
 schema: '2.0'
 stages:
-  prepare_data:
-    cmd: python src/prepare_data.py -ip data/raw/test_scores.csv -op data/prepared/prepared_data.csv
-      -tetp data/prepared/test_target.csv -tefp data/prepared/test_features.csv -trtp
-      data/prepared/train_target.csv -trfp data/prepared/train_features.csv -ftp data/prepared/full_target.csv
-      -ffp data/prepared/full_features.csv -s 42 -ts 0.2
+  data_preparation:
+    cmd: python data_preparation.py -id data/raw -od data/prepared -uf data/raw/test_scores.csv
     deps:
+    - path: data/raw
+      hash: md5
+      md5: 43b57b30382241b81e14cf5f4de36e6d.dir
+      size: 171469
+      nfiles: 2
     - path: data/raw/test_scores.csv
       hash: md5
       md5: dedbbc2822e89a304dc36cb350198b37
       size: 171367
-    - path: src/prepare_data.py
+    - path: data_preparation.py
       hash: md5
-      md5: 6a91677019689cfa60c27a5aea29288b
-      size: 3030
+      md5: 09ea8f29f8e664aa91dde3aecd349f1a
+      size: 4038
     params:
       params.yaml:
-        path:
-          train_features: data/prepared/train_features.csv
-          train_target: data/prepared/train_target.csv
-          test_features: data/prepared/test_features.csv
-          test_target: data/prepared/test_target.csv
-          full_features: data/prepared/full_features.csv
-          full_target: data/prepared/full_target.csv
-          prepared_data: data/prepared/prepared_data.csv
-          raw_data: data/raw/test_scores.csv
-          lr_model: model/linear_regressor.pickle
-          dt_model: model/decision_tree.pickle
-          cb_model: model/cat_boost.pickle
-          lr_model_prod: model/linear_regressor_prod.pickle
-          dt_model_prod: model/decision_tree_prod.pickle
-          cb_model_prod: model/cat_boost_prod.pickle
-          lr_metrics: lr_metics.json
-          dt_metrics: dt_metrics.json
-          cb_metrics: cb_metrics.json
-        seed: 42
-        split: 0.2
+        data_preparation:
+          train_test_ratio: 0.8
+          train_val_ratio: 0.9
+          random_state: 42
     outs:
-    - path: data/prepared/full_features.csv
+    - path: data/prepared
       hash: md5
-      md5: 047518bfbdf584e9dc58f53c63cd8d42
-      size: 65837
-    - path: data/prepared/full_target.csv
-      hash: md5
-      md5: c6f9d88ad0bc5c1783f61441ce494aa3
-      size: 11921
-    - path: data/prepared/prepared_data.csv
-      hash: md5
-      md5: 3b850faccee1754b4ae41cf05db7cf12
-      size: 75773
-    - path: data/prepared/test_features.csv
-      hash: md5
-      md5: 1fcb0c6ad256cf005f0fad718309c565
-      size: 13164
-    - path: data/prepared/test_target.csv
-      hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
-    - path: data/prepared/train_features.csv
-      hash: md5
-      md5: 369446098d33b3bd5c7c684c4dcc254f
-      size: 52762
-    - path: data/prepared/train_target.csv
-      hash: md5
-      md5: 20c47de9d054f731d6417d964f44313c
-      size: 9537
-  train_model:
-    cmd: python src/train_model.py -idp data/prepared/prepared_data.csv -trfp data/prepared/train_features.csv
-      -tefp data/prepared/test_features.csv -trtp data/prepared/train_target.csv -tetp
-      data/prepared/test_target.csv -omp model/predictor.pickle -s 42 -ts 0.2
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+  linear_regression:
+    cmd: python linear_regression.py -id data/prepared -od data/models -mn LinearRegression
     deps:
-    - path: data/prepared/prepared_data.csv
+    - path: data/prepared
       hash: md5
-      md5: 3b850faccee1754b4ae41cf05db7cf12
-      size: 75773
-    - path: src/train_model.py
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: linear_regression.py
       hash: md5
-      md5: 09b9f0bc6405f36d63b9695980e9d490
-      size: 1901
+      md5: cc579f4dfd3decb39be683711756305f
+      size: 2431
     params:
       params.yaml:
-        path.output_model: model/predictor.pickle
-        path.prepared_data: data/prepared/prepared_data.csv
-        path.test_features: data/prepared/test_features.csv
-        path.test_target: data/prepared/test_target.csv
-        path.train_features: data/prepared/train_features.csv
-        path.train_target: data/prepared/train_target.csv
-        seed: 42
-        split: 0.2
+        linear_regression:
+          model_name: LinearRegression
     outs:
-    - path: data/prepared/test_features.csv
+    - path: data/models/LinearRegression.csv
       hash: md5
-      md5: 324a424c9e2523450ed4077f8355e0bb
-      size: 13137
-    - path: data/prepared/test_target.csv
+      md5: 7221e795a28810432e053604224fa69f
+      size: 178
+    - path: data/models/LinearRegression.joblib
       hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
-    - path: data/prepared/train_features.csv
-      hash: md5
-      md5: 15520c770da4b8b5fe20fb161ef67355
-      size: 52622
-    - path: data/prepared/train_target.csv
-      hash: md5
-      md5: 20c47de9d054f731d6417d964f44313c
-      size: 9537
-    - path: model/predictor.pickle
-      hash: md5
-      md5: 497a27dfc8c4ee763db268f2807d6a18
-      size: 704
-  evaluate_model:
-    cmd: python src/evaluate_model.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
-      -mp model/predictor.pickle -op metrics.json
+      md5: 0e410150c53011f636fa34d569c87b6a
+      size: 1087
+  linear_regression_validation:
+    cmd: python linear_regression_validation.py -id data/prepared/ -im data/models/LinearRegression.joblib
+      -mn LinearRegression
     deps:
-    - path: data/prepared/test_features.csv
+    - path: data/models/LinearRegression.joblib
       hash: md5
-      md5: 324a424c9e2523450ed4077f8355e0bb
-      size: 13137
-    - path: data/prepared/test_target.csv
+      md5: 0e410150c53011f636fa34d569c87b6a
+      size: 1087
+    - path: data/prepared/
       hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
-    - path: data/prepared/train_features.csv
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: linear_regression_validation.py
       hash: md5
-      md5: 15520c770da4b8b5fe20fb161ef67355
-      size: 52622
-    - path: data/prepared/train_target.csv
-      hash: md5
-      md5: 20c47de9d054f731d6417d964f44313c
-      size: 9537
-    - path: model/predictor.pickle
-      hash: md5
-      md5: 497a27dfc8c4ee763db268f2807d6a18
-      size: 704
-    - path: src/evaluate_model.py
-      hash: md5
-      md5: c2ad52506abc4736c28a0ffa526ced22
-      size: 1246
+      md5: effee5d988a529268a5c76667666fc43
+      size: 1593
     params:
       params.yaml:
-        path.metrics: metrics.json
-        path.test_features: data/prepared/test_features.csv
-        path.test_target: data/prepared/test_target.csv
-        path.train_features: data/prepared/train_features.csv
-        path.train_target: data/prepared/train_target.csv
-    outs:
-    - path: metrics.json
-      hash: md5
-      md5: f51d01f1001c318803461940f080621f
-      size: 78
-  train_LR:
-    cmd: python src/train_LR.py -fp data/prepared/train_features.csv -tp data/prepared/train_target.csv
-      -omp model/linear_regressor.pickle
+        linear_regression:
+          model_name: LinearRegression
+  linear_regression_prod_version:
+    cmd: python linear_regression_prod_version.py -id data/prepared/ -od data/models/
+      -mn LinearRegression
     deps:
-    - path: data/prepared/train_features.csv
+    - path: data/models/LinearRegression.joblib
       hash: md5
-      md5: 369446098d33b3bd5c7c684c4dcc254f
-      size: 52762
-    - path: data/prepared/train_target.csv
+      md5: 0e410150c53011f636fa34d569c87b6a
+      size: 1087
+    - path: data/prepared
       hash: md5
-      md5: 20c47de9d054f731d6417d964f44313c
-      size: 9537
-    - path: src/train_LR.py
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: linear_regression_prod_version.py
       hash: md5
-      md5: 4628ea85e9385a7495322fe428b3d20c
-      size: 1021
+      md5: 97af72ae0c701e7d24be3c267b73c613
+      size: 3335
     params:
       params.yaml:
-        path:
-          train_features: data/prepared/train_features.csv
-          train_target: data/prepared/train_target.csv
-          test_features: data/prepared/test_features.csv
-          test_target: data/prepared/test_target.csv
-          full_features: data/prepared/full_features.csv
-          full_target: data/prepared/full_target.csv
-          prepared_data: data/prepared/prepared_data.csv
-          raw_data: data/raw/test_scores.csv
-          lr_model: model/linear_regressor.pickle
-          dt_model: model/decision_tree.pickle
-          cb_model: model/cat_boost.pickle
-          lr_model_prod: model/linear_regressor_prod.pickle
-          dt_model_prod: model/decision_tree_prod.pickle
-          cb_model_prod: model/cat_boost_prod.pickle
-          lr_metrics: lr_metics.json
-          dt_metrics: dt_metrics.json
-          cb_metrics: cb_metrics.json
+        linear_regression:
+          model_name: LinearRegression
     outs:
-    - path: model/linear_regressor.pickle
+    - path: data/models/LinearRegression_prod.csv
       hash: md5
-      md5: 9d85edb1727df9034ab71e9d1372d625
-      size: 715
-  evaluate_LR:
-    cmd: python src/evaluate_LR.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
-      -mp model/linear_regressor.pickle -op lr_metics.json
+      md5: 66169f923b7fcc4e958a951087ebd805
+      size: 181
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+  decision_tree@DecisionTree:
+    cmd: python decision_tree.py -id data/prepared -od data/models -bm data/models/LinearRegression_prod.joblib
+      -mn DecisionTree -p params.yaml
     deps:
-    - path: data/prepared/test_features.csv
+    - path: data/models/LinearRegression_prod.joblib
       hash: md5
-      md5: 1fcb0c6ad256cf005f0fad718309c565
-      size: 13164
-    - path: data/prepared/test_target.csv
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared
       hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
-    - path: model/linear_regressor.pickle
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree.py
       hash: md5
-      md5: 9d85edb1727df9034ab71e9d1372d625
-      size: 715
-    - path: src/evaluate_LR.py
-      hash: md5
-      md5: c2ad52506abc4736c28a0ffa526ced22
-      size: 1246
+      md5: 774a5509f44c4702f5bb51065e523055
+      size: 3307
     params:
       params.yaml:
-        path:
-          train_features: data/prepared/train_features.csv
-          train_target: data/prepared/train_target.csv
-          test_features: data/prepared/test_features.csv
-          test_target: data/prepared/test_target.csv
-          full_features: data/prepared/full_features.csv
-          full_target: data/prepared/full_target.csv
-          prepared_data: data/prepared/prepared_data.csv
-          raw_data: data/raw/test_scores.csv
-          lr_model: model/linear_regressor.pickle
-          dt_model: model/decision_tree.pickle
-          cb_model: model/cat_boost.pickle
-          lr_model_prod: model/linear_regressor_prod.pickle
-          dt_model_prod: model/decision_tree_prod.pickle
-          cb_model_prod: model/cat_boost_prod.pickle
-          lr_metrics: lr_metics.json
-          dt_metrics: dt_metrics.json
-          cb_metrics: cb_metrics.json
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
     outs:
-    - path: lr_metics.json
+    - path: data/models/DecisionTree.joblib
       hash: md5
-      md5: f51d01f1001c318803461940f080621f
-      size: 78
-  prod_LR:
-    cmd: python src/train_LR.py -fp data/prepared/full_features.csv -tp data/prepared/full_target.csv
-      -omp model/linear_regressor_prod.pickle
+      md5: 3e095e354718a0606ed6a18dd9c2230d
+      size: 30127
+  decision_tree@RandomForest:
+    cmd: python decision_tree.py -id data/prepared -od data/models -bm data/models/LinearRegression_prod.joblib
+      -mn RandomForest -p params.yaml
     deps:
-    - path: data/prepared/full_features.csv
+    - path: data/models/LinearRegression_prod.joblib
       hash: md5
-      md5: 047518bfbdf584e9dc58f53c63cd8d42
-      size: 65837
-    - path: data/prepared/full_target.csv
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared
       hash: md5
-      md5: c6f9d88ad0bc5c1783f61441ce494aa3
-      size: 11921
-    - path: src/train_LR.py
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree.py
       hash: md5
-      md5: 4628ea85e9385a7495322fe428b3d20c
-      size: 1021
+      md5: 774a5509f44c4702f5bb51065e523055
+      size: 3307
     params:
       params.yaml:
-        path:
-          train_features: data/prepared/train_features.csv
-          train_target: data/prepared/train_target.csv
-          test_features: data/prepared/test_features.csv
-          test_target: data/prepared/test_target.csv
-          full_features: data/prepared/full_features.csv
-          full_target: data/prepared/full_target.csv
-          prepared_data: data/prepared/prepared_data.csv
-          raw_data: data/raw/test_scores.csv
-          lr_model: model/linear_regressor.pickle
-          dt_model: model/decision_tree.pickle
-          cb_model: model/cat_boost.pickle
-          lr_model_prod: model/linear_regressor_prod.pickle
-          dt_model_prod: model/decision_tree_prod.pickle
-          cb_model_prod: model/cat_boost_prod.pickle
-          lr_metrics: lr_metics.json
-          dt_metrics: dt_metrics.json
-          cb_metrics: cb_metrics.json
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
     outs:
-    - path: model/linear_regressor_prod.pickle
+    - path: data/models/RandomForest.joblib
       hash: md5
-      md5: 68d62543c6d24b05959fbad47310d8d9
-      size: 715
-  train_DT:
-    cmd: python src/train_DT.py -fp data/prepared/train_features.csv -tp data/prepared/train_target.csv
-      -omp model/decision_tree.pickle -p params.yaml
+      md5: e050c5f1b03ca644fa628633b98c3bf2
+      size: 181791
+  decision_tree@ExtraTree:
+    cmd: python decision_tree.py -id data/prepared -od data/models -bm data/models/LinearRegression_prod.joblib
+      -mn ExtraTree -p params.yaml
     deps:
-    - path: data/prepared/train_features.csv
+    - path: data/models/LinearRegression_prod.joblib
       hash: md5
-      md5: 369446098d33b3bd5c7c684c4dcc254f
-      size: 52762
-    - path: data/prepared/train_target.csv
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared
       hash: md5
-      md5: 20c47de9d054f731d6417d964f44313c
-      size: 9537
-    - path: src/train_DT.py
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree.py
       hash: md5
-      md5: 968cf499ffaf3f104806d2090aed539b
-      size: 2514
+      md5: 774a5509f44c4702f5bb51065e523055
+      size: 3307
     params:
       params.yaml:
-        path:
-          train_features: data/prepared/train_features.csv
-          train_target: data/prepared/train_target.csv
-          test_features: data/prepared/test_features.csv
-          test_target: data/prepared/test_target.csv
-          full_features: data/prepared/full_features.csv
-          full_target: data/prepared/full_target.csv
-          prepared_data: data/prepared/prepared_data.csv
-          raw_data: data/raw/test_scores.csv
-          lr_model: model/linear_regressor.pickle
-          dt_model: model/decision_tree.pickle
-          cb_model: model/cat_boost.pickle
-          lr_model_prod: model/linear_regressor_prod.pickle
-          dt_model_prod: model/decision_tree_prod.pickle
-          cb_model_prod: model/cat_boost_prod.pickle
-          lr_metrics: lr_metics.json
-          dt_metrics: dt_metrics.json
-          cb_metrics: cb_metrics.json
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
     outs:
-    - path: model/decision_tree.pickle
+    - path: data/models/ExtraTree.joblib
       hash: md5
-      md5: 511d8658a770a51271ca38d16c1bf018
-      size: 24550
-  evaluate_DT:
-    cmd: python src/evaluate_DT.py -tp data/prepared/test_target.csv -fp data/prepared/test_features.csv
-      -mp model/decision_tree.pickle -op dt_metrics.json
+      md5: 3d5988ef47e830d643fa5cf83860a9b1
+      size: 204463
+  decision_tree_validation@DecisionTree:
+    cmd: python decision_tree_validation.py -id data/prepared/ -im data/models/DecisionTree.joblib
+      -bm data/models/LinearRegression_prod.joblib -mn DecisionTree
     deps:
-    - path: data/prepared/test_features.csv
+    - path: data/models/DecisionTree.joblib
       hash: md5
-      md5: 1fcb0c6ad256cf005f0fad718309c565
-      size: 13164
-    - path: data/prepared/test_target.csv
+      md5: 3e095e354718a0606ed6a18dd9c2230d
+      size: 30127
+    - path: data/models/LinearRegression_prod.joblib
       hash: md5
-      md5: afcba19219240ba2afaf22d924fb5eaf
-      size: 2394
-    - path: model/decision_tree.pickle
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared/
       hash: md5
-      md5: 511d8658a770a51271ca38d16c1bf018
-      size: 24550
-    - path: src/evaluate_DT.py
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_validation.py
       hash: md5
-      md5: 99fab36405dfa6130075de00799a3843
-      size: 3255
+      md5: 22eb795f6e8eb0de59c6474486748919
+      size: 2061
     params:
       params.yaml:
-        path:
-          train_features: data/prepared/train_features.csv
-          train_target: data/prepared/train_target.csv
-          test_features: data/prepared/test_features.csv
-          test_target: data/prepared/test_target.csv
-          full_features: data/prepared/full_features.csv
-          full_target: data/prepared/full_target.csv
-          prepared_data: data/prepared/prepared_data.csv
-          raw_data: data/raw/test_scores.csv
-          lr_model: model/linear_regressor.pickle
-          dt_model: model/decision_tree.pickle
-          cb_model: model/cat_boost.pickle
-          lr_model_prod: model/linear_regressor_prod.pickle
-          dt_model_prod: model/decision_tree_prod.pickle
-          cb_model_prod: model/cat_boost_prod.pickle
-          lr_metrics: lr_metics.json
-          dt_metrics: dt_metrics.json
-          cb_metrics: cb_metrics.json
-    outs:
-    - path: dt_metrics.json
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+  decision_tree_validation@RandomForest:
+    cmd: python decision_tree_validation.py -id data/prepared/ -im data/models/RandomForest.joblib
+      -bm data/models/LinearRegression_prod.joblib -mn RandomForest
+    deps:
+    - path: data/models/LinearRegression_prod.joblib
       hash: md5
-      md5: 2e26cf7ea146a9b6ab39c5540e4d021e
-      size: 79
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/models/RandomForest.joblib
+      hash: md5
+      md5: e050c5f1b03ca644fa628633b98c3bf2
+      size: 181791
+    - path: data/prepared/
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_validation.py
+      hash: md5
+      md5: 22eb795f6e8eb0de59c6474486748919
+      size: 2061
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+  decision_tree_validation@ExtraTree:
+    cmd: python decision_tree_validation.py -id data/prepared/ -im data/models/ExtraTree.joblib
+      -bm data/models/LinearRegression_prod.joblib -mn ExtraTree
+    deps:
+    - path: data/models/ExtraTree.joblib
+      hash: md5
+      md5: 3d5988ef47e830d643fa5cf83860a9b1
+      size: 204463
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared/
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_validation.py
+      hash: md5
+      md5: 22eb795f6e8eb0de59c6474486748919
+      size: 2061
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+  decision_tree_prod_version@DecisionTree:
+    cmd: python decision_tree_prod_version.py -id data/prepared/ -od data/models/
+      -mn DecisionTree
+    deps:
+    - path: data/models/DecisionTree.joblib
+      hash: md5
+      md5: 88ebb74f1dc6b79960963c0fb43a29f4
+      size: 30127
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_prod_version.py
+      hash: md5
+      md5: b344cb2087ea66cd30d892b10e25822f
+      size: 3945
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+    outs:
+    - path: data/models/DecisionTree_prod.joblib
+      hash: md5
+      md5: caafdd85569b946b7a0129c6acec3816
+      size: 14161
+  decision_tree_prod_version@RandomForest:
+    cmd: python decision_tree_prod_version.py -id data/prepared/ -od data/models/
+      -mn RandomForest
+    deps:
+    - path: data/models/RandomForest.joblib
+      hash: md5
+      md5: 972efc7c76df4d64704c80335645d866
+      size: 149487
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_prod_version.py
+      hash: md5
+      md5: b344cb2087ea66cd30d892b10e25822f
+      size: 3945
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+    outs:
+    - path: data/models/RandomForest_prod.joblib
+      hash: md5
+      md5: 7a2d0bd7a2fa3e694623da2e5e536712
+      size: 161649
+  decision_tree_prod_version@ExtraTree:
+    cmd: python decision_tree_prod_version.py -id data/prepared/ -od data/models/
+      -mn ExtraTree
+    deps:
+    - path: data/models/ExtraTree.joblib
+      hash: md5
+      md5: 3f656045b2346e4d168c3c851bd9ad0b
+      size: 210223
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_prod_version.py
+      hash: md5
+      md5: b344cb2087ea66cd30d892b10e25822f
+      size: 3945
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+    outs:
+    - path: data/models/ExtraTree_prod.joblib
+      hash: md5
+      md5: 2cbf1decb0c7e4db4c2967e22efef016
+      size: 114273
+  catboost@CatBoost:
+    cmd: python catboost_dt.py -id data/prepared -od data/models -bm data/models/LinearRegression_prod.joblib
+      -mn CatBoost
+    deps:
+    - path: catboost_dt.py
+      hash: md5
+      md5: 71fb247a87211ae03569f7c9a2c81f09
+      size: 3676
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 100
+            - 150
+            - 200
+            depth:
+            - 6
+            - 8
+            - 10
+            - 12
+            - 14
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            - 10
+            - 15
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 150
+            depth: 6
+            learning_rate: 0.05
+            l2_leaf_reg: 3
+            loss_function: RMSE
+            verbose: false
+    outs:
+    - path: data/models/CatBoost.joblib
+      hash: md5
+      md5: bdea80eede922005e1102915653965e6
+      size: 112650
+  catboost_validation@CatBoost:
+    cmd: python catboost_validation.py -id data/prepared/ -mp data/models/CatBoost.joblib
+      -bm data/models/LinearRegression_prod.joblib -mn CatBoost
+    deps:
+    - path: catboost_validation.py
+      hash: md5
+      md5: 87f98055161f747e12439b476d044809
+      size: 2674
+    - path: data/models/CatBoost.joblib
+      hash: md5
+      md5: bdea80eede922005e1102915653965e6
+      size: 112650
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared/
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 50
+            - 100
+            - 150
+            depth:
+            - 6
+            - 8
+            - 10
+            - 12
+            - 14
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            - 10
+            - 15
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 100
+            depth: 6
+            learning_rate: 0.1
+            l2_leaf_reg: 10
+            loss_function: RMSE
+            verbose: false
+  catboost@CatBoost_Prod:
+    cmd: python catboost_dt.py -id data/prepared -od data/models -bm data/models/LinearRegression_prod.joblib
+      -mn CatBoost_Prod
+    deps:
+    - path: catboost_dt.py
+      hash: md5
+      md5: 71fb247a87211ae03569f7c9a2c81f09
+      size: 3676
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 50
+            - 100
+            - 150
+            depth:
+            - 6
+            - 8
+            - 10
+            - 12
+            - 14
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            - 10
+            - 15
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 100
+            depth: 6
+            learning_rate: 0.1
+            l2_leaf_reg: 10
+            loss_function: RMSE
+            verbose: false
+    outs:
+    - path: data/models/CatBoost_Prod.joblib
+      hash: md5
+      md5: 704ce1fe6816adc64832ebb59faba81d
+      size: 112650
+  catboost_prod_version@CatBoost_Prod:
+    cmd: python catboost_prod_version.py -id data/prepared/ -od data/models/ -mn CatBoost_Prod
+    deps:
+    - path: catboost_prod_version.py
+      hash: md5
+      md5: 3c4009718649d1cd5b516a91ac16cbf7
+      size: 4495
+    - path: data/models/CatBoost_Prod.joblib
+      hash: md5
+      md5: 4733faf595167159f17ac66e6701a6a7
+      size: 160682
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 150
+            depth:
+            - 10
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 150
+            depth: 6
+            learning_rate: 0.05
+            l2_leaf_reg: 3
+            loss_function: RMSE
+            verbose: false
+    outs:
+    - path: data/models/CatBoost_Prod_prod.joblib
+      hash: md5
+      md5: 2840c73c125bc5c37f8a54920d469e29
+      size: 160682
+  catboost_prod_version@CatBoost:
+    cmd: python catboost_prod_version.py -id data/prepared/ -od data/models/ -mn CatBoost
+    deps:
+    - path: catboost_prod_version.py
+      hash: md5
+      md5: 3c4009718649d1cd5b516a91ac16cbf7
+      size: 4495
+    - path: data/models/CatBoost.joblib
+      hash: md5
+      md5: 9b1b8fb2f7de873e95b1a6405028cc17
+      size: 2110402
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 150
+            depth:
+            - 10
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 150
+            depth: 6
+            learning_rate: 0.05
+            l2_leaf_reg: 3
+            loss_function: RMSE
+            verbose: false
+    outs:
+    - path: data/models/CatBoost_prod.joblib
+      hash: md5
+      md5: 4733faf595167159f17ac66e6701a6a7
+      size: 160682
+  catboost_validation@CatBoost_Prod:
+    cmd: python catboost_validation.py -id data/prepared/ -mp data/models/CatBoost_Prod.joblib
+      -bm data/models/LinearRegression_prod.joblib -mn CatBoost_Prod
+    deps:
+    - path: catboost_validation.py
+      hash: md5
+      md5: 87f98055161f747e12439b476d044809
+      size: 2674
+    - path: data/models/CatBoost_Prod.joblib
+      hash: md5
+      md5: 704ce1fe6816adc64832ebb59faba81d
+      size: 112650
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+    - path: data/prepared/
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 50
+            - 100
+            - 150
+            depth:
+            - 6
+            - 8
+            - 10
+            - 12
+            - 14
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            - 10
+            - 15
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 100
+            depth: 6
+            learning_rate: 0.1
+            l2_leaf_reg: 10
+            loss_function: RMSE
+            verbose: false
+  linear_regression_prod:
+    cmd: python linear_regression_prod.py -id data/prepared/ -od data/models/ -mn
+      LinearRegression
+    deps:
+    - path: data/models/LinearRegression.joblib
+      hash: md5
+      md5: 0e410150c53011f636fa34d569c87b6a
+      size: 1087
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: linear_regression_prod.py
+      hash: md5
+      md5: 073fb1b4b2f83aace228ddce9b234d07
+      size: 2795
+    params:
+      params.yaml:
+        linear_regression:
+          model_name: LinearRegression
+    outs:
+    - path: data/models/LinearRegression_prod.csv
+      hash: md5
+      md5: 66169f923b7fcc4e958a951087ebd805
+      size: 181
+    - path: data/models/LinearRegression_prod.joblib
+      hash: md5
+      md5: d73b636589e50fc9e27f268c17c126c8
+      size: 1087
+  decision_tree_prod@DecisionTree:
+    cmd: python decision_tree_prod.py -id data/prepared/ -od data/models/ -mn DecisionTree
+    deps:
+    - path: data/models/DecisionTree.joblib
+      hash: md5
+      md5: 3e095e354718a0606ed6a18dd9c2230d
+      size: 30127
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_prod.py
+      hash: md5
+      md5: 9592c0847f36dd9921e326a47fd53a04
+      size: 3423
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+    outs:
+    - path: data/models/DecisionTree_prod.joblib
+      hash: md5
+      md5: 9d9b7958589968ac2a1fb55a2509ce77
+      size: 14881
+  decision_tree_prod@RandomForest:
+    cmd: python decision_tree_prod.py -id data/prepared/ -od data/models/ -mn RandomForest
+    deps:
+    - path: data/models/RandomForest.joblib
+      hash: md5
+      md5: e050c5f1b03ca644fa628633b98c3bf2
+      size: 181791
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_prod.py
+      hash: md5
+      md5: 9592c0847f36dd9921e326a47fd53a04
+      size: 3423
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+    outs:
+    - path: data/models/RandomForest_prod.joblib
+      hash: md5
+      md5: 2c671358a1a4b7b143840d6a3f951721
+      size: 136209
+  decision_tree_prod@ExtraTree:
+    cmd: python decision_tree_prod.py -id data/prepared/ -od data/models/ -mn ExtraTree
+    deps:
+    - path: data/models/ExtraTree.joblib
+      hash: md5
+      md5: 3d5988ef47e830d643fa5cf83860a9b1
+      size: 204463
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    - path: decision_tree_prod.py
+      hash: md5
+      md5: 9592c0847f36dd9921e326a47fd53a04
+      size: 3423
+    params:
+      params.yaml:
+        decision_tree:
+          DecisionTree:
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            splitter:
+            - best
+            - random
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          RandomForest:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+          ExtraTree:
+            n_estimators:
+            - 1
+            - 2
+            - 5
+            - 10
+            - 15
+            max_depth:
+            - 2
+            - 4
+            - 6
+            - 7
+            min_samples_split:
+            - 2
+            - 3
+            - 4
+            - 10
+            - 15
+            min_samples_leaf:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 18
+            - 48
+    outs:
+    - path: data/models/ExtraTree_prod.joblib
+      hash: md5
+      md5: 74997a7054e9e2b211fbed030ea0f4fc
+      size: 193089
+  catboost_prod@CatBoost:
+    cmd: python catboost_prod.py -id data/prepared/ -od data/models/ -mn CatBoost
+    deps:
+    - path: catboost_prod.py
+      hash: md5
+      md5: 60e142bb7f0a7acd0f9b08cdeed3384c
+      size: 4652
+    - path: data/models/CatBoost.joblib
+      hash: md5
+      md5: bdea80eede922005e1102915653965e6
+      size: 112650
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 50
+            - 100
+            - 150
+            depth:
+            - 6
+            - 8
+            - 10
+            - 12
+            - 14
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            - 10
+            - 15
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 100
+            depth: 6
+            learning_rate: 0.1
+            l2_leaf_reg: 10
+            loss_function: RMSE
+            verbose: false
+    outs:
+    - path: data/models/CatBoost_prod.joblib
+      hash: md5
+      md5: 5907f4f377fe7670c36a5de83a6bb798
+      size: 111562
+  catboost_prod@CatBoost_Prod:
+    cmd: python catboost_prod.py -id data/prepared/ -od data/models/ -mn CatBoost_Prod
+    deps:
+    - path: catboost_prod.py
+      hash: md5
+      md5: 60e142bb7f0a7acd0f9b08cdeed3384c
+      size: 4652
+    - path: data/models/CatBoost_Prod.joblib
+      hash: md5
+      md5: 5907f4f377fe7670c36a5de83a6bb798
+      size: 111562
+    - path: data/prepared
+      hash: md5
+      md5: be2c52a699e1bdcc0e617bfdef016a35.dir
+      size: 155714
+      nfiles: 8
+    params:
+      params.yaml:
+        catboost:
+          CatBoost:
+            iterations:
+            - 50
+            - 100
+            - 150
+            depth:
+            - 6
+            - 8
+            - 10
+            - 12
+            - 14
+            learning_rate:
+            - 0.1
+            l2_leaf_reg:
+            - 5
+            - 10
+            - 15
+            loss_function:
+            - RMSE
+            verbose:
+            - false
+          CatBoost_Prod:
+            iterations: 100
+            depth: 6
+            learning_rate: 0.1
+            l2_leaf_reg: 10
+            loss_function: RMSE
+            verbose: false
+    outs:
+    - path: data/models/CatBoost_Prod_prod.joblib
+      hash: md5
+      md5: a359b28e7e9603634ae0ffee17845d28
+      size: 111562
