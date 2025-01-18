@@ -9,7 +9,7 @@ decision_tree:
     max_depth: [4]
     splitter: [ 'best', 'random' ]
     min_samples_split: [2]
-    min_samples_leaf: [2]
+    min_samples_leaf: [1]
   RandomForest:
     n_estimators: [10]
     max_depth: [4]
@@ -17,6 +17,18 @@ decision_tree:
     min_samples_leaf: [2]
   ExtraTree:
     n_estimators: [15]
-    max_depth: [4]
-    min_samples_split: [2]
-    min_samples_leaf: [2]
+    max_depth: [6]
+    min_samples_split: [15]
+    min_samples_leaf: [4]
+    
+catboost:
+  TrainCatBoost:
+    iterations: [100,200,300]
+    depth: [4,6,8,10]
+    learning_rate: [0.01,0.1,0.2] 
+    l2_leaf_reg: [1,2,3,4,5] 
+  ProdCatBoost:
+    iterations: 100 #[100,200,300]
+    depth: 4 #[4,6,8,10]
+    learning_rate: 0.1 #[0.01,0.1,0.2] 
+    l2_leaf_reg: 2 #[1,2,3,4,5] 

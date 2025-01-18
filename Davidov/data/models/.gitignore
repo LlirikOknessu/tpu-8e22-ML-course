@@ -8,3 +8,16 @@
 /DecisionTree_prod.joblib
 /RandomForest_prod.joblib
 /ExtraTree_prod.joblib
+/CatBoost.joblib
+/CatBoost_Prod.joblib
+/CatBoost_Prod_prod.joblib
+/iterations.joblib
+/depth.joblib
+/learning_rate.joblib
+/l2_leaf_reg.joblib
+/loss_function.joblib
+/verbose.joblib
+/TrainCatBoost.joblib
+/ProdCatBoost.joblib
+/TrainCatBoost_prod.joblib
+/ProdCatBoost_prod.joblib

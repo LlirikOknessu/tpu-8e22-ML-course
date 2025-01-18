@@ -17,9 +17,9 @@ TREES_MODELS_MAPPER = {
 
 # Оптимальные параметры для каждой модели (настроенные на этапе тренировки)
 TREES_MODELS_BEST_PARAMETERS = {
-    'DecisionTree': {'max_depth': 7, 'min_samples_leaf': 4, 'min_samples_split': 2, 'splitter': 'random'}, # r-score 0.749
-    'RandomForest': {'max_depth': 7, 'min_samples_leaf': 1, 'min_samples_split': 3, 'n_estimators': 10}, # 0.805
-    'ExtraTree': {'max_depth': 7, 'min_samples_leaf': 4, 'min_samples_split': 15, 'n_estimators': 10} # 0.74
+    'DecisionTree': {'max_depth': 4, 'min_samples_leaf': 1, 'min_samples_split': 2, 'splitter': 'random'}, # r-score 0.749
+    'RandomForest': {'max_depth': 4, 'min_samples_leaf': 2, 'min_samples_split': 2, 'n_estimators': 15}, # 0.805
+    'ExtraTree': {'max_depth': 6, 'min_samples_leaf': 4, 'min_samples_split': 15, 'n_estimators': 10} # 0.74
 }
 
 
@@ -80,9 +80,3 @@ if __name__ == '__main__':
         )
         fig.savefig(output_model_path)
         print(f"Графическое представление дерева решений сохранено в {output_model_path}")
-
-    y_pred_full = reg.predict(X_full)
-
-    mae_full = mean_absolute_error(y_full, y_pred_full)
-    mse_full = mean_squared_error(y_full, y_pred_full)
-    r2_full = r2_score(y_full, y_pred_full)

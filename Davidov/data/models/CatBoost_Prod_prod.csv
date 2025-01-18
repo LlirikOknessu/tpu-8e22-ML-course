@@ -1,0 +1,2 @@
+iterations,depth,learning_rate,l2_leaf_reg,loss_function,mae,mse,r2_score
+150,6,0.05,3,RMSE,2277.120352099416,17871511.69020345,0.8768813455557475
