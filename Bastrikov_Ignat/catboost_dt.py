@@ -9,7 +9,8 @@ from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.base import RegressorMixin
 from catboost import CatBoostRegressor
 import random
-
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def parser_args_for_sac():
     parser = argparse.ArgumentParser(description='Paths parser')
@@ -20,10 +21,74 @@ def parser_args_for_sac():
     parser.add_argument('--baseline_model', '-bm', type=str, default='data/models/LinearRegression_prod.joblib',
                         required=False, help='path to linear regression prod version')
     parser.add_argument('--model_name', '-mn', type=str, default='LR', required=False,
-                        help='file with dvc stage params')
+                        help='name of the model being trained')
     parser.add_argument('--params', '-p', type=str, default='params.yaml', required=False,
                         help='file with dvc stage params')
     return parser.parse_args()
+
+def plot_feature_importance(model, feature_names, output_path):
+
+    importance = model.get_feature_importance(prettified=True)
+    importance_df = pd.DataFrame(importance)
+    importance_df.set_index('Feature Id', inplace=True)
+
+    importance_df = importance_df.sort_values(by='Importances', ascending=False)
+
+    plt.figure(figsize=(10, 8))
+    sns.barplot(x='Importances', y=importance_df.index, data=importance_df, palette='viridis')
+    plt.title('Feature Importance')
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    plt.tight_layout()
+
+    output_path = Path(output_dir) / "feature_importance.png"
+
+    plt.savefig(output_path)
+    plt.close()
+    print(f"График важности признаков сохранен в {output_path}")
+
+def calculate_mean_deviation(mae_res, outliers, genres, types):
+    mean_deviation_results = []
+    mean_deviation_results.append({'category': '=== mae_res ===', 'mean_deviation': None, 'count': None})
+
+    # для mae_res
+    for genre in genres:
+        genre_mask = mae_res[genre] == 1
+        if genre_mask.sum() > 0:
+            mean_dev = mae_res.loc[genre_mask, 'difference'].mean()
+            mean_deviation_results.append({'category': genre, 'mean_deviation': mean_dev, 'count': genre_mask.sum()})
+
+    for anime_type in types:
+        type_mask = mae_res[anime_type] == 1
+        if type_mask.sum() > 0:
+            mean_dev = mae_res.loc[type_mask, 'difference'].mean()
+            mean_deviation_results.append({'category': anime_type, 'mean_deviation': mean_dev, 'count': type_mask.sum()})
+
+    mean_deviation_results.append({'category': '=== OUTLIERS ===', 'mean_deviation': None, 'count': None})
+
+    # для outliers
+    for genre in genres:
+        genre_mask = outliers[genre] == 1
+        if genre_mask.sum() > 0:
+            mean_dev = outliers.loc[genre_mask, 'difference'].mean()
+            mean_deviation_results.append({'category': genre, 'mean_deviation': mean_dev, 'count': genre_mask.sum()})
+
+    for anime_type in types:
+        type_mask = outliers[anime_type] == 1
+        if type_mask.sum() > 0:
+            mean_dev = outliers.loc[type_mask, 'difference'].mean()  # Среднее отклонение
+            mean_deviation_results.append({'category': anime_type, 'mean_deviation': mean_dev, 'count': type_mask.sum()})
+
+    # Создаём DataFrame из результатов
+    mean_deviation_results_df = pd.DataFrame(mean_deviation_results)
+    mean_deviation_results_df.to_csv(".\data\prepared\mean_deviation.csv", index=False)
+    print(f"\nСреднее отклонение по жанрам и типам сохранено")
+
+    # export
+    # outliers.to_csv(".\data\prepared\outliers.csv", index=False)
+    #print("Outliers для каждого столбика сохранен в data\prepared")
+    #mae_res.to_csv(".\data\prepared\mae_res.csv", index=False)
+    #print("Mae для каждого столбика сохранен в data\prepared")
 
 
 if __name__ == '__main__':
@@ -88,6 +153,7 @@ if __name__ == '__main__':
     print('outliers count:', outliers.shape[0])
     print('mae_res count:', mae_res.shape[0])
     print('% of outliers', (outliers.shape[0] / mae_res.shape[0]) * 100)
+
     print('==============================test==============================')
     # Create extra files
     genres = ['Action/Adventure', 'Fantasy/Supernatural', 'Comedy', 'Drama/Romance', 'Science Fiction', 'Psychological/Thriller', 'Other/Uncategorized']
@@ -96,50 +162,27 @@ if __name__ == '__main__':
     existing_columns = [col for col in genres if col in X_test.columns]
     existing_types = [col for col in types if col in X_test.columns]
 
-    mae_res = pd.concat([mae_res, X_test[genres], X_test[types]], axis=1)
-    outliers = pd.concat([outliers, X_test[genres], X_test[types]], axis=1)
-
-    mean_deviation_results = []
-    mean_deviation_results.append({'category': '=== mae_res ===', 'mean_deviation': None, 'count': None})
-
-    # для mae_res
-    for genre in genres:
-        genre_mask = mae_res[genre] == 1  # Фильтруем строки, где данный жанр активен
-        if genre_mask.sum() > 0:  # Проверяем, есть ли данные для жанра
-            mean_dev = mae_res.loc[genre_mask, 'difference'].mean()  # Среднее отклонение
-            mean_deviation_results.append({'category': genre, 'mean_deviation': mean_dev, 'count': genre_mask.sum()})
-
-    for anime_type in types:
-        type_mask = mae_res[anime_type] == 1  # Фильтруем строки, где данный тип активен
-        if type_mask.sum() > 0:  # Проверяем, есть ли данные для типа
-            mean_dev = mae_res.loc[type_mask, 'difference'].mean()  # Среднее отклонение
-            mean_deviation_results.append({'category': anime_type, 'mean_deviation': mean_dev, 'count': type_mask.sum()})
-
-    mean_deviation_results.append({'category': '=== OUTLIERS ===', 'mean_deviation': None, 'count': None})
-
-    # для outliers
-    for genre in genres:
-        genre_mask = outliers[genre] == 1  # Фильтруем строки, где данный жанр активен
-        if genre_mask.sum() > 0:  # Проверяем, есть ли данные для жанра
-            mean_dev = outliers.loc[genre_mask, 'difference'].mean()  # Среднее отклонение
-            mean_deviation_results.append({'category': genre, 'mean_deviation': mean_dev, 'count': genre_mask.sum()})
-
-    for anime_type in types:
-        type_mask = outliers[anime_type] == 1  # Фильтруем строки, где данный тип активен
-        if type_mask.sum() > 0:  # Проверяем, есть ли данные для типа
-            mean_dev = outliers.loc[type_mask, 'difference'].mean()  # Среднее отклонение
-            mean_deviation_results.append({'category': anime_type, 'mean_deviation': mean_dev, 'count': type_mask.sum()})
-
-    # Создаём DataFrame из результатов
-    mean_deviation_results_df = pd.DataFrame(mean_deviation_results)
-
-    mean_deviation_results_df.to_csv(".\data\prepared\mean_deviation.csv", index=False)
-    print(f"\nСреднее отклонение по жанрам и типам сохранено")
-
-    # export
     outliers.to_csv(".\data\prepared\outliers.csv", index=False)
-    print("Outliers для каждого столбика сохранен в data\prepared")
     mae_res.to_csv(".\data\prepared\mae_res.csv", index=False)
-    print("Mae для каждого столбика сохранен в data\prepared")
+    print("Mae_res в общем виде сохранен в data\prepared")
+    print("Outliers в общем виде в data\prepared")
+
+    mae_res_genres_and_types = pd.concat([mae_res, X_test[genres], X_test[types]], axis=1)
+    outliers_genres_and_types = pd.concat([outliers, X_test[genres], X_test[types]], axis=1)
+    outliers_genres_and_types.dropna(inplace=True)
+    mae_res_genres_and_types.dropna(inplace=True)
+    calculate_mean_deviation(mae_res_genres_and_types, outliers_genres_and_types, genres, types)
+    # ========================== feature importance =======================================
+    feature_names = X_train.columns.tolist()
+    plot_feature_importance(grid_search.best_estimator_, feature_names, output_dir)
+    # =====================================================================================
+    # export
+    outliers_genres_and_types.to_csv(".\data\prepared\outliers_genres_and_types.csv", index=False)
+    mae_res_genres_and_types.to_csv(".\data\prepared\mae_res_genres_and_types.csv", index=False)
+
+    print("Outliers для genres_and_types сохранен в data\prepared")
+    print("Mae для genres_and_types сохранен в data\prepared")
+
+
 
     dump(grid_search.best_estimator_, output_model_joblib_path)

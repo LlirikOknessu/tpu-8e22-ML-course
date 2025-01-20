@@ -1,0 +1,23 @@
+cmd: python NN_train.py -id data/prepared/ -od data/models/ -mn BATCH_SIZE
+deps:
+- path: NN_train.py
+  hash: md5
+  md5: 18323af316dc25ed14037c70be7ceab3
+  size: 7743
+- path: data/prepared/
+  hash: md5
+  md5: e67b2ade5bb6a7efe9985f25b16007e3.dir
+  size: 7595357
+  nfiles: 13
+params:
+  params.yaml:
+    NN:
+      BATCH_SIZE: 64
+      BUFFER_SIZE: 512
+      LEARNING_RATE: 0.0001
+      EPOCHS: 20
+outs:
+- path: data/models/BATCH_SIZE.h5
+  hash: md5
+  md5: 1e0adff5a6855d97c77ed96ddd140aec
+  size: 49632

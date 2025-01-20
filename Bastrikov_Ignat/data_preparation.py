@@ -26,20 +26,20 @@ def calculate_genre_stats(df: pd.DataFrame) -> pd.DataFrame:
     df_genres['genre'] = df_genres['genre'].str.split(',')  # Разделяем жанры
     df_genres = df_genres.explode('genre').reset_index(drop=True)  # Разделяем строки для каждого жанра
 
-    genre_rating = df_genres.groupby('genre')['rating'].mean()
+    # genre_rating = df_genres.groupby('genre')['rating'].mean()
     genre_members = df_genres.groupby('genre')['members'].mean()
 
-    def avg_genre_rating(genres):
-        genre_ratings = genre_rating[genres]  # Получаем средний рейтинг жанров
-        return genre_ratings.mean()
+    # def avg_genre_rating(genres):
+    #     genre_ratings = genre_rating[genres]  # Получаем средний рейтинг жанров
+    #     return genre_ratings.mean()
 
     def avg_members_genre(genres):
         genre_members_ = genre_members[genres]  # Получаем среднее количество участников по жанрам
         return genre_members_.mean()
 
-    df['avg_rating_genre'] = df['genre'].apply(
-        lambda genres: avg_genre_rating(genres.split(',')) if isinstance(genres, str) else None
-    )
+    # df['avg_rating_genre'] = df['genre'].apply(
+    #     lambda genres: avg_genre_rating(genres.split(',')) if isinstance(genres, str) else None
+    # )
     df['avg_members_genre'] = df['genre'].apply(
         lambda genres: avg_members_genre(genres.split(',')) if isinstance(genres, str) else None
     )
@@ -63,7 +63,7 @@ def calculate_anime_type_features(df: pd.DataFrame) -> pd.DataFrame:
         'anime_id': 'count'
     }).reset_index()
     df['anime_count_by_type'] = df['type'].map(df_grouped.set_index('type')['anime_id'])
-    df['avg_rating_by_type'] = df['type'].map(df_grouped.set_index('type')['rating'])
+    # df['avg_rating_by_type'] = df['type'].map(df_grouped.set_index('type')['rating'])
     df['avg_members_by_type'] = df['type'].map(df_grouped.set_index('type')['members'])
     return df
 
@@ -134,19 +134,20 @@ def clean_data(df: pd.DataFrame, df_users: pd.DataFrame) -> pd.DataFrame:
     df['word_count'] = df['name'].str.split().str.len()
 
     # logirovanie
-    df['log_members'] = np.log(df['members'] + 1)  # Доавляем 1, чтобы избежать log(0)
-    df['log_episodes'] = np.log(df['episodes'] + 1)
-    df['log_len_of_title'] = np.log(df['len_of_title'] + 1)
-    df['log_avg_members_genre'] = np.log(df['avg_members_genre'] + 1)
-    df['log_episode_density'] = np.log(df['episode_density'] + 1)
-    df['log_anime_count_by_type'] = np.log(df['anime_count_by_type'] + 1)
-    df['log_avg_rating_by_type'] = np.log(df['avg_rating_by_type'] + 1)
-    df['log_user_activity'] = np.log(df['user_activity'] + 1)
-    df['log_genre_count'] = np.log(df['genre_count'] + 1)
-    df['log_total_rated'] = np.log(df['total_rated'] + 1)
-    df['log_favourite_count'] = np.log(df['favourite_count'] + 1)
-    df['log_word_count'] = np.log(df['word_count'] + 1)
-    df.drop(["name","genre", "anime_id", "members", "avg_members_genre", "episodes", "len_of_title", "anime_count_by_type", "avg_rating_by_type", "episode_density", 'user_activity', "genre_count", "total_rated", "favourite_count", "word_count"], axis=1, inplace=True)
+    df['log_episodes_per_type'] = np.log(df['episodes_per_type'] + 10 ** -6)
+    df['log_members'] = np.log(df['members'] + 10 ** -6)  # Доавляем 1, чтобы избежать log(0)
+    df['log_episodes'] = np.log(df['episodes'] + 10 ** -6)
+    df['log_len_of_title'] = np.log(df['len_of_title'] + 10 ** -6)
+    df['log_avg_members_genre'] = np.log(df['avg_members_genre'] + 10 ** -6)
+    df['log_episode_density'] = np.log(df['episode_density'] + 10 ** -6)
+    df['log_anime_count_by_type'] = np.log(df['anime_count_by_type'] + 10 ** -6)
+    # df['log_avg_rating_by_type'] = np.log(df['avg_rating_by_type'] + 10 ** -6)
+    df['log_user_activity'] = np.log(df['user_activity'] + 10 ** -6)
+    df['log_genre_count'] = np.log(df['genre_count'] + 10 ** -6)
+    df['log_total_rated'] = np.log(df['total_rated'] + 10 ** -6)
+    df['log_favourite_count'] = np.log(df['favourite_count'] + 10 ** -6)
+    df['log_word_count'] = np.log(df['word_count'] + 10 ** -6)
+    df.drop(["episodes_per_type", "name","genre", "anime_id", "members", "avg_members_genre", "episodes", "len_of_title", "anime_count_by_type", "episode_density", 'user_activity', "genre_count", "total_rated", "favourite_count", "word_count"], axis=1, inplace=True)
     df = one_hot_encode(df, 'type')
     print("\nПропущенные значения после обработки:")
     print(df.isnull().sum())  # Вывод количества пропущенных значений после обработки

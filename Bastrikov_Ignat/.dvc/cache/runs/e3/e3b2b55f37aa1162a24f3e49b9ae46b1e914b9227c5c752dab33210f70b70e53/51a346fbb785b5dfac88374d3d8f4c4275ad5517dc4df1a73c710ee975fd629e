@@ -1,0 +1,23 @@
+cmd: python NN_train_prod.py -id data/prepared/ -od data/models/
+deps:
+- path: NN_train_prod.py
+  hash: md5
+  md5: 4c4b9bf5ee4da7ee2e531247e6d7e007
+  size: 6502
+- path: data/prepared
+  hash: md5
+  md5: ef7d7858af99388d80ccd53d6845fb12.dir
+  size: 7595428
+  nfiles: 14
+params:
+  params.yaml:
+    NN:
+      BATCH_SIZE: 64
+      BUFFER_SIZE: 512
+      LEARNING_RATE: 0.0001
+      EPOCHS: 10
+outs:
+- path: data/models/nn_model_prod.h5
+  hash: md5
+  md5: 73d1892a1a71fef8df6420c130ea66ad
+  size: 77664

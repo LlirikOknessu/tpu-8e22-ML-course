@@ -1,0 +1,29 @@
+cmd: python NN_train.py -id data/prepared/ -od data/models/ -mn Neutral_Net_Prod
+deps:
+- path: NN_train.py
+  hash: md5
+  md5: 2a755672ce232018128a7f3c6fa2cb2a
+  size: 7758
+- path: data/prepared/
+  hash: md5
+  md5: 97a487f5e37597ee349676085d534701.dir
+  size: 7256064
+  nfiles: 8
+params:
+  params.yaml:
+    NN:
+      Neutral_Net:
+        BATCH_SIZE: 64
+        BUFFER_SIZE: 512
+        LEARNING_RATE: 0.0001
+        EPOCHS: 1000
+      Neutral_Net_Prod:
+        BATCH_SIZE: 64
+        BUFFER_SIZE: 512
+        LEARNING_RATE: 0.0001
+        EPOCHS: 1000
+outs:
+- path: data/models/Neutral_Net_Prod.h5
+  hash: md5
+  md5: f78fd3e29e7a7fed1e59a841a89e3bca
+  size: 49632

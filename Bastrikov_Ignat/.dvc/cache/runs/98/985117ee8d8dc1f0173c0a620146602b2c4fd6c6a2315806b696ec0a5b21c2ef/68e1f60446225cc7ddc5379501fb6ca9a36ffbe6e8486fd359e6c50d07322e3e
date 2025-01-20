@@ -1,0 +1,44 @@
+cmd: python catboost_dt.py -id data/prepared -od data/models -bm data/models/LinearRegression_prod.joblib
+  -mn CatBoost_Prod
+deps:
+- path: catboost_dt.py
+  hash: md5
+  md5: c8ffc78dd92bcc80cc104ec418c3503d
+  size: 7705
+- path: data/models/LinearRegression_prod.joblib
+  hash: md5
+  md5: a7c6b0dd6625eddcea5adedb91ee2cba
+  size: 1967
+- path: data/prepared
+  hash: md5
+  md5: 3cda7f03bf2d098722a182c9d431f6e0.dir
+  size: 7988068
+  nfiles: 10
+params:
+  params.yaml:
+    catboost:
+      CatBoost:
+        iterations:
+        - 150
+        depth:
+        - 10
+        learning_rate:
+        - 0.1
+        l2_leaf_reg:
+        - 5
+        loss_function:
+        - RMSE
+        verbose:
+        - false
+      CatBoost_Prod:
+        iterations: 150
+        depth: 6
+        learning_rate: 0.05
+        l2_leaf_reg: 3
+        loss_function: RMSE
+        verbose: false
+outs:
+- path: data/models/CatBoost_Prod.joblib
+  hash: md5
+  md5: 2f38b2ce290b0e0582da99a4a4eb0363
+  size: 2478404

@@ -109,3 +109,31 @@ stages:
         - data/models/${key}_prod.joblib
       params:
         - catboost
+  NN_train:
+    cmd: python NN_train.py -id data/prepared/ -od data/models/
+    deps:
+      - NN_train.py
+      - data/prepared
+    outs:
+      - data/models/nn_model.h5
+    params:
+      - NN
+  NN_train_validation:
+    cmd: python NN_train_validation.py -id data/prepared/ -od data/models/
+    deps:
+      - NN_train.py
+      - data/prepared
+      - data/models/nn_model.h5
+    params:
+      - NN
+  NN_train_prod:
+    cmd: python NN_train_prod.py -id data/prepared/ -od data/models/
+    deps:
+      - NN_train_prod.py
+      - data/prepared
+    outs:
+      - data/models/nn_model_prod.h5
+    params:
+      - NN
+
+

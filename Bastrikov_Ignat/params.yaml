@@ -26,7 +26,7 @@ catboost:
     depth: [10] # 6
     learning_rate: [0.1] # 0.1
     l2_leaf_reg: [5]  # 1
-    loss_function: [ 'RMSE' ] # стандарт - Root Mean Squared Error
+    loss_function: ['RMSE'] # стандарт - Root Mean Squared Error
     verbose: [ False ]
   CatBoost_Prod:
     iterations: 150
@@ -35,3 +35,79 @@ catboost:
     l2_leaf_reg: 3
     loss_function: 'RMSE'
     verbose: False
+NN:
+  BATCH_SIZE: 64   # 64
+  BUFFER_SIZE: 512   # 512
+  LEARNING_RATE: 0.0001 # 0.001
+  EPOCHS: 4000 # 2000
+
+#flowchart TD
+#        node1["NN_train"]
+#        node2["NN_train_prod"]
+#        node3["NN_train_validation"]
+#        node4["catboost@CatBoost"]
+#        node5["catboost@CatBoost_Prod"]
+#        node6["catboost_prod_version@CatBoost"]
+#        node7["catboost_prod_version@CatBoost_Prod"]
+#        node8["catboost_validation@CatBoost"]
+#        node9["catboost_validation@CatBoost_Prod"]
+#        node10["data\raw.dvc"]
+#        node11["data_preparation"]
+#        node12["decision_tree@DecisionTree"]
+#        node13["decision_tree@ExtraTree"]
+#        node14["decision_tree@RandomForest"]
+#        node15["decision_tree_prod_version@DecisionTree"]
+#        node16["decision_tree_prod_version@ExtraTree"]
+#        node17["decision_tree_prod_version@RandomForest"]
+#        node18["decision_tree_validation@DecisionTree"]
+#        node19["decision_tree_validation@ExtraTree"]
+#        node20["decision_tree_validation@RandomForest"]
+#        node21["linear_regression"]
+#        node22["linear_regression_prod_version"]
+#        node23["linear_regression_validation"]
+#        node1-->node3
+#        node4-->node6
+#        node4-->node8
+#        node5-->node7
+#        node5-->node9
+#        node10-->node11
+#        node11-->node1
+#        node11-->node2
+#        node11-->node3
+#        node11-->node4
+#        node11-->node5
+#        node11-->node6
+#        node11-->node7
+#        node11-->node8
+#        node11-->node9
+#        node11-->node12
+#        node11-->node13
+#        node11-->node14
+#        node11-->node15
+#        node11-->node16
+#        node11-->node17
+#        node11-->node18
+#        node11-->node19
+#        node11-->node20
+#        node11-->node21
+#        node11-->node22
+#        node11-->node23
+#        node12-->node15
+#        node12-->node18
+#        node13-->node16
+#        node13-->node19
+#        node14-->node17
+#        node14-->node20
+#        node21-->node22
+#        node21-->node23
+#        node22-->node4
+#        node22-->node5
+#        node22-->node8
+#        node22-->node9
+#        node22-->node12
+#        node22-->node13
+#        node22-->node14
+#        node22-->node18
+#        node22-->node19
+#        node22-->node20
+

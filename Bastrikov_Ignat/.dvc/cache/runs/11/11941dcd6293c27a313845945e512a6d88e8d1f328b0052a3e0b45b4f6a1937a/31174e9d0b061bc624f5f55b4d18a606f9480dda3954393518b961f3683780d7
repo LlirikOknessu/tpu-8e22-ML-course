@@ -1,0 +1,29 @@
+cmd: python NN_train.py -id data/prepared/ -od data/models/ -mn BUFFER_SIZE
+deps:
+- path: NN_train.py
+  hash: md5
+  md5: 2a755672ce232018128a7f3c6fa2cb2a
+  size: 7758
+- path: data/prepared/
+  hash: md5
+  md5: e67b2ade5bb6a7efe9985f25b16007e3.dir
+  size: 7595357
+  nfiles: 13
+params:
+  params.yaml:
+    NN:
+      Neutral_Net:
+        BATCH_SIZE: 64
+        BUFFER_SIZE: 512
+        LEARNING_RATE: 0.0001
+        EPOCHS: 20
+      Neutral_Net_Prod:
+        BATCH_SIZE: 64
+        BUFFER_SIZE: 512
+        LEARNING_RATE: 0.0001
+        EPOCHS: 10
+outs:
+- path: data/models/BUFFER_SIZE.h5
+  hash: md5
+  md5: bc95c18a61d28ba0670a8a2ca49b9723
+  size: 49632
