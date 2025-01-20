@@ -43,6 +43,7 @@ if __name__ == '__main__':
 
     output_dir.mkdir(exist_ok=True, parents=True)
     output_model_joblib_path = output_dir / (args.model_name + '.joblib')
+    output_best_params = output_dir / (args.model_name + '.csv')
 
     X_train_name = input_dir / 'X_train.csv'
     y_train_name = input_dir / 'y_train.csv'
@@ -61,17 +62,18 @@ if __name__ == '__main__':
     if isinstance(decision_tree_model, RandomForestRegressor) or isinstance(decision_tree_model, ExtraTreesRegressor):
         y_train = np.ravel(y_train.values)
         y_test = np.ravel(y_test.values)
-    decision_tree_regressor = decision_tree_regressor.fit(X=X_train, y=y_train)
+    reg = decision_tree_regressor.fit(X=X_train, y=y_train)
 
     baseline_model = load(baseline_model_path)
     y_pred_baseline = np.squeeze(baseline_model.predict(X_test))
 
-    predicted_values = np.squeeze(decision_tree_regressor.predict(X_test))
+    predicted_values = np.squeeze(reg.predict(X_test))
 
-    print(decision_tree_regressor.best_params_)
+    print(reg.best_params_)
     print("Baseline MAE: ", mean_absolute_error(y_test, y_pred_baseline))
     print("Model MAE:    ", mean_absolute_error(y_test, predicted_values))
-    score = decision_tree_regressor.score(X_test, y_test)
+    score = reg.score(X_test, y_test)
     print(f"Score:         {score:.4f}")
+    pd.DataFrame(reg.best_params_, index=[0]).to_csv(output_best_params, index=False)
 
-    dump(decision_tree_regressor, output_model_joblib_path)
+    dump(reg, output_model_joblib_path)

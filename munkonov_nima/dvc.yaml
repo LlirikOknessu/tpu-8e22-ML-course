@@ -74,38 +74,57 @@ stages:
       params:
         - decision_tree
   catboost:
-    foreach: ${catboost}
-    do:
-      cmd: python catboost_dt.py -id data/prepared -od data/models -bm data/models/${linear_regression.model_name}_prod.joblib -mn ${key}
-      deps:
-        - catboost_dt.py
-        - data/prepared
-        - data/models/${linear_regression.model_name}_prod.joblib
-      outs:
-        - data/models/${key}.joblib
-      params:
-        - catboost
-      always_changed: true
+    cmd: python catboost_dt.py -id data/prepared -od data/models -bm data/models/${linear_regression.model_name}_prod.joblib -mn CatBoost
+    deps:
+      - catboost_dt.py
+      - data/prepared
+      - data/models/${linear_regression.model_name}_prod.joblib
+    outs:
+      - data/models/CatBoost.joblib
+    params:
+      - catboost
   catboost_validation:
-    foreach: ${catboost}
-    do:
-      cmd: python catboost_validation.py -id data/prepared/ -mp data/models/${key}.joblib -bm data/models/${linear_regression.model_name}_prod.joblib -mn ${key}
-      deps:
-        - catboost_validation.py
-        - data/prepared/
-        - data/models/${key}.joblib
-        - data/models/${linear_regression.model_name}_prod.joblib
-      params:
-        - catboost
+    cmd: python catboost_validation.py -id data/prepared/ -mp data/models/CatBoost.joblib -bm data/models/${linear_regression.model_name}_prod.joblib -mn CatBoost
+    deps:
+      - catboost_validation.py
+      - data/prepared/
+      - data/models/CatBoost.joblib
+      - data/models/${linear_regression.model_name}_prod.joblib
+    params:
+      - catboost
   catboost_prod:
-    foreach: ${catboost}
-    do:
-      cmd: python catboost_prod.py -id data/prepared/ -od data/models/ -mn ${key}
-      deps:
-        - catboost_prod.py
-        - data/prepared
-        - data/models/${key}.joblib
-      outs:
-        - data/models/${key}_prod.joblib
-      params:
-        - catboost
+    cmd: python catboost_prod.py -id data/prepared/ -od data/models/ -mn CatBoost
+    deps:
+      - catboost_prod.py
+      - data/prepared
+    outs:
+      - data/models/CatBoost_prod.joblib
+    params:
+      - catboost
+  neural_network:
+    cmd: python neural_network.py -id data/prepared -od data/models -mn ${neural_network.model_name} -lp data/logs -p params.yaml
+    deps:
+      - neural_network.py
+      - data/prepared
+    outs:
+      - data/models/${neural_network.model_name}.joblib
+    params:
+      - neural_network
+  neural_network_validation:
+    cmd: python neural_network_validation.py -id data/prepared/ -im data/models/${neural_network.model_name}.joblib -mn ${neural_network.model_name} -lp data/logs -p params.yaml
+    deps:
+      - neural_network_validation.py
+      - data/prepared/
+      - data/models/${neural_network.model_name}.joblib
+    params:
+      - neural_network
+  neural_network_prod:
+    cmd: python neural_network_prod.py -id data/prepared/ -od data/models/ -mn ${neural_network.model_name} -lp data/logs -p params.yaml
+    deps:
+      - neural_network_prod.py
+      - data/prepared
+      - data/models/${neural_network.model_name}.joblib
+    outs:
+      - data/models/${neural_network.model_name}_prod.joblib
+    params:
+      - neural_network

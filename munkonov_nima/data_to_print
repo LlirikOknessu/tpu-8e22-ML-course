@@ -1,7 +1,7 @@
 Модель CatBoost (CatBoost)
 --------------< >--------------
 Score: -2.2663
-Лучшие параметры: {'depth': 6, 'iterations': 100, 'l2_leaf_reg': 10, 'learning_rate': 0.1, 'loss_function': 'RMSE', 'verbose': False}
+Лучшие параметры: {'depth': 4, 'iterations': 230, 'l2_leaf_reg': 5, 'learning_rate': 0.03, 'loss_function': 'RMSE', 'verbose': False}
 Baseline MAE: 2.2442
 Model MAE: 2.4082
 outliers count: 290
@@ -12,10 +12,43 @@ mae_res count: 397
 MAE: 2.1482
 MSE: 7.3676
 R² Score: 0.9619
-Признак: n_student, важность: 1.24
-Признак: pretest, важность: 34.40
-Признак: f_lunch, важность: 3.91
-Признак: f_teaching_method, важность: 11.92
-Признак: f_school_setting, важность: 1.75
-Признак: f_school_type, важность: 2.82
-Признак: f_class_mean, важность: 43.97
+Признак: n_student, важность: 0.62
+Признак: pretest, важность: 39.34
+Признак: f_lunch, важность: 0.86
+Признак: f_teaching_method, важность: 9.52
+Признак: f_school_setting, важность: 0.61
+Признак: f_school_type, важность: 0.22
+Признак: f_class_mean, важность: 48.83
+
+DecisionTree
+{'max_depth': 7, 'min_samples_leaf': 4, 'min_samples_split': 2, 'splitter': 'best'}
+Model MAE:     2.6409783024913924
+Score:         0.9470
+
+RandomForest
+{'max_depth': 6, 'min_samples_leaf': 1, 'min_samples_split': 6, 'n_estimators': 10}
+Model MAE:     2.586138978541115
+Score:         0.9480
+
+ExtraTree
+{'max_depth': 7, 'min_samples_leaf': 1, 'min_samples_split': 10, 'n_estimators': 10}
+Model MAE:     2.589318300142766
+Score:         0.9491
+
+LinearRegression
+Model MAE:     2.497075121445419
+R² Score:      0.9534
+Coeffients:
+0   -0.027142
+1    0.451298
+2    1.083042
+3    6.045314
+4    0.146246
+5   -0.104670
+6    0.495788
+
+
+NEURAL NETWORK VALIDATION
+Model MAE:     2.5683810710906982
+R² Score:      0.9506ы
+

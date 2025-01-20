@@ -9,3 +9,5 @@
 /DecisionTree_prod.joblib
 /RandomForest_prod.joblib
 /ExtraTree_prod.joblib
+/NeuralNetwork_prod.joblib
+/NeuralNetwork.joblib
