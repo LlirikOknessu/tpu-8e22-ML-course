@@ -8,6 +8,7 @@ from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
 from sklearn.metrics import mean_absolute_error
 from joblib import dump
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 TREES_MODELS_MAPPER = {'DecisionTree': tree.DecisionTreeRegressor,
                        'RandomForest': RandomForestRegressor,
@@ -62,3 +63,14 @@ if __name__ == '__main__':
                            filled=True)
         fig.savefig(output_model_path)
     dump(reg, output_model_joblib_path)
+
+    y_pred_full = reg.predict(X_train)
+
+    mae_full = mean_absolute_error(y_train, y_pred_full)
+    mse_full = mean_squared_error(y_train, y_pred_full)
+    r2_full = r2_score(y_train, y_pred_full)
+
+    print(f"\nProduction модель метрики (обучение на всех данных):")
+    print(f"MAE: {mae_full:.4f}")
+    print(f"MSE: {mse_full:.4f}")
+    print(f"R² Score: {r2_full:.4f}")

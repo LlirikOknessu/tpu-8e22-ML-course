@@ -55,12 +55,15 @@ if __name__ == '__main__':
     print("Baseline MAE: ", mean_absolute_error(y_test, y_pred_baseline))
     print("Model MAE: ", mean_absolute_error(y_test, predicted_values))
 
+    r2_score = reg.score(X_test, y_test)
+    print(f"R² Score: {r2_score:.4f}")
+
     intercept = reg.intercept_.astype(float)
     coefficients = reg.coef_.astype(float)
     intercept = pd.Series(intercept, name='intercept')
     coefficients = pd.Series(coefficients[0], name='coefficients')
     print("intercept:", intercept)
-    print("list of coefficients:", coefficients)
+    print("list of coefficients:\n", coefficients)
     columns = [x for x in range(len(coefficients))]
     out_model = pd.DataFrame([coefficients, intercept])
     out_model.to_csv(output_model_path, index=False)
