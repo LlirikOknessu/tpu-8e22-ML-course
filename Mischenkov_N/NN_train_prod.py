@@ -63,7 +63,7 @@ if __name__ == '__main__':
     args = parser_args_for_sac()
     with open(args.params, 'r') as f:
         params_all = yaml.safe_load(f)
-    params = params_all['Neural_network']
+    params = params_all['Neural_net']
 
     BATCH_SIZE = params['BATCH_SIZE']
     BUFFER_SIZE = params['BUFFER_SIZE']
@@ -134,18 +134,6 @@ if __name__ == '__main__':
         )
 
     # Save the model
-    model.save(output_dir / 'nn_model_prod.h5')
-    print(f"Модель сохранена в data/models/nn_model_prod.h5")
-
-    # predictions = model.predict(X.to_numpy()).flatten()
-    # y_true = y.numpy().flatten()
-    #
-    # # Создание DataFrame
-    # predictions_df = pd.DataFrame({
-    #     'Prediction': predictions,
-    #     'True_Value': y_true
-    # })
-    #
-    # predictions_df.to_csv(output_dir / 'predictions.csv', index=False)
-    # print(f"Предсказания сохранены в {output_dir / 'predictions.csv'}")
+    model.save(output_dir / 'Neural_network_model_prod.h5')
+    print(f"Модель сохранена в data/models/Neural_network_model_prod.h5")
 

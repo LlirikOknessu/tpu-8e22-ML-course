@@ -31,8 +31,8 @@ catboost:
     depth: 10
     learning_rate: 0.2
     l2_leaf_reg: 2
-Neural_network:
-  BATCH_SIZE: 64   # 64
-  BUFFER_SIZE: 512   # 512
-  LEARNING_RATE: 0.01 # 0.001
-  EPOCHS: 1000 # 2000
+Neural_net:
+  BATCH_SIZE: 128   #
+  BUFFER_SIZE: 512   #
+  LEARNING_RATE: 0.1 #
+  EPOCHS: 2000  #

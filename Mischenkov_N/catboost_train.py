@@ -100,4 +100,7 @@ if __name__ == '__main__':
     print(f"Baseline MAE: {mae_baseline:.4f}")
     print(f"Model MAE: {mae_catboost:.4f}")
 
+    feature_names = X_train.columns.tolist()
+    plot_feature_importance(grid_search.best_estimator_, feature_names, output_dir)
+
     dump(grid_search.best_estimator_, output_model_joblib_path)

@@ -32,7 +32,7 @@ if __name__ == '__main__':
     args = parser_args_for_sac()
     with open(args.params, 'r') as f:
         params_all = yaml.safe_load(f)
-    params = params_all['Neural_network']
+    params = params_all['Neural_net']
 
     input_dir = Path(args.input_dir)
     model_dir = Path(args.model_dir)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     X_val, y_val = load_data(input_dir)
 
     # Загрузка модели
-    model_path = model_dir / 'nn_model.h5'
+    model_path = model_dir / 'Neural_network_model.h5'
     if not model_path.exists():
         raise FileNotFoundError(f"Model file {model_path} does not exist.")
 

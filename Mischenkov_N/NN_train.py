@@ -70,7 +70,7 @@ if __name__ == '__main__':
     args = parser_args_for_sac()
     with open(args.params, 'r') as f:
         params_all = yaml.safe_load(f)
-    params = params_all['Neural_network']
+    params = params_all['Neural_net']
 
     input_dir = Path(args.input_dir)
     output_dir = Path(args.output_dir)
@@ -160,5 +160,5 @@ if __name__ == '__main__':
         )
 
     # Save the model
-    model.save(output_dir / f'nn_model.h5')
-    print(f"Модель сохранена в data/models/nn_model.h5")
+    model.save(output_dir / f'Neural_network_model.h5')
+    print(f"Модель сохранена в data/models/Neural_network_model.h5")

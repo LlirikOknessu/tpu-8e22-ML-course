@@ -10,4 +10,6 @@
 /ExtraTree.joblib
 /CatBoost.joblib
 /CatBoost_prod.joblib
-/nn_model_prod.h5
+/nn_model.h5
+/Neural_network_model.h5
+/Neural_network_model_prod.h5
