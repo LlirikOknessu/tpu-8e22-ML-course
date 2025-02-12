@@ -162,7 +162,7 @@ if __name__ == '__main__':
         combined_df = one_hot_encoding(combined_df)
         combined_df = data_normalization(combined_df)
         combined_df['selling_price'] = np.log(combined_df['selling_price'] + 10 ** -6)
-        X, y = combined_df.drop(["selling_price", "year", 'brand', 'model'], axis=1), combined_df['selling_price']
+        X, y = combined_df.drop(["selling_price", "year", 'brand', 'model', 'log_km_per_year'], axis=1), combined_df['selling_price']
 
         X_train, X_test, y_train, y_test = train_test_split(X, y,
                                                             train_size=params.get('train_test_ratio'),
